@@ -89,3 +89,8 @@ The historical status `NO_MATCH` means no matching item appeared in the queried 
 Location use: refresh sends current coordinates to Open-Meteo for cloud forecasts and Element 84 Earth Search for scene history. GeoJSON pin records remain phone-side and are excluded from those requests; the user explicitly opens the settings export page to view/copy them.
 
 The in-swath/edge status is a TLE-age/swath-margin heuristic, not a probability. The 60-day, four-location hindcast is a limited sample and must not be presented as global or future-performance validation.
+
+
+## 2026-09-28 catalogue label correction — 0.3.3
+
+The list abbreviation for `PASS_NO_MATCH` must be `NO MATCH`; do not use `NO SCENE`, which can be read as proof that no acquisition occurred. Keep the fuller hero message `NO SCENE MATCH FOUND` and public copy explaining that a catalogue no-match is not proof of no acquisition. Verify the rendered list in the emulator before publication.

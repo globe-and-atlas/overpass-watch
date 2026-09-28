@@ -26,11 +26,11 @@ included in those requests; they appear as GeoJSON only when you open the export
 ## Install
 
 - [Install from the RePebble App Store](https://apps.repebble.com/6e920a2fa6304e45b4644116)
-- [Download the 0.3.2 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.3.2)
+- [Download the 0.3.3 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.3.3)
 - [Open in CloudPebble](https://cloudpebble.repebble.com/ide/import/github/globe-and-atlas/overpass-watch/main) (the branch is in the link because CloudPebble's import defaults to `master`)
 - Or build locally: `cd watchface && pebble build && pebble install --cloudpebble build/watchface.pbw`
 
-## Past and future (0.3.2)
+## Past and future (0.3.3)
 
 UP scrolls back through the last 30 days, DOWN forward through the next 16; the default selection is
 the next pass. Past passes come from the same prediction model, matched (same satellite, within

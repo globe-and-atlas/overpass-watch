@@ -1,1 +1,1 @@
-0.3.2: Clarifies location use, reports catalogue no-matches without claiming non-acquisition, and narrows the scope of the pass hindcast results.
+0.3.3: Clarifies the history list status with a concise NO MATCH label. A catalogue no-match is not evidence that no acquisition occurred.

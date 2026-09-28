@@ -241,7 +241,7 @@ static void draw_list(GContext *ctx, uint32_t now) {
       snprintf(tag, sizeof(tag), "WAIT");
       color = GColorLiberty;
     } else if (p->flags & PASS_NO_MATCH) {
-      snprintf(tag, sizeof(tag), "NO SCENE");
+      snprintf(tag, sizeof(tag), "NO MATCH");
       color = GColorLightGray;
     } else {
       cloud_text(p, tag, sizeof(tag));

@@ -64,3 +64,5 @@ Cause: save() swallowed localStorage failures; pin/clear still acknowledged succ
 - 2026-09-28: Workspace `session_capture.py` was started as required but remained blocked in its remote LLM capture call for over three minutes with no output; terminated the hung process. Session facts are recorded directly in this project's SESSION.md.
 - 2026-09-28: Developer dashboard editor accepts and retains the corrected Overpass description, but the public app page still serves its older description on a cache-busted fetch; investigate the dashboard-to-store propagation path before calling public copy complete.
 - 2026-09-28: Dashboard edits initially did not appear in the public listing; after propagation, browser verification confirmed the corrected Overpass text on the public app page.
+
+- 2026-09-28: A bundled-file lookup targeted the nonexistent `watchface/appinfo.json`; the package version lives in `watchface/package.json`, and generated app metadata lives under `watchface/build/`.

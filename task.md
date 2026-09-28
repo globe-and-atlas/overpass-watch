@@ -87,3 +87,18 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] Verify RePebble serves version `0.3.2` and preserve its exact PBW in the GitHub release.
 - [x] Save corrected privacy/history/confidence copy in the linked developer dashboard.
 - [x] Confirm the public RePebble page serves the corrected description and 0.3.2 package.
+
+
+## Historical catalogue-status label correction — 0.3.3
+
+### Validation Contract
+- [x] A past pass with `PASS_NO_MATCH` renders `NO MATCH` in the list, not `NO SCENE`.
+- [x] The same state retains explanatory hero text that says no matching scene was found.
+- [x] The production build succeeds with an empty `dev.json` fixture.
+- [x] The refreshed Store list render visibly uses `NO MATCH`.
+- [ ] The GitHub release and RePebble listing serve version 0.3.3.
+
+### Checklist
+- [x] Update the abbreviated watch list label and release notes.
+- [x] Rebuild and inspect the list render.
+- [ ] Publish the verified 0.3.3 package to GitHub and RePebble.

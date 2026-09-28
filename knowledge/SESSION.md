@@ -9,7 +9,7 @@ Agent: OpenAI Codex (GPT-6)
 Handoff-from: OpenAI Codex
 Handoff-type: continuation
 Goal: Correct Overpass privacy and historical-status claims; update GitHub and RePebble editions.
-Status: Complete — GitHub/RePebble 0.3.2 source, binary, renders, and corrected public description verified.
+Status: In progress — correcting ambiguous catalogue label and historical release notes across both public listings.
 
 GitHub release: https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.2.0
 Store: https://apps.repebble.com/6e920a2fa6304e45b4644116
@@ -39,3 +39,5 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 16:03 — commit: docs: track listing propagation gap | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
 - 2026-09-28 16:10 — public Overpass page now displays the 30-day catalogue history, no-match caveat, forecast/swath heuristic limits, and coordinate-use disclosure; verified in browser.
 - 2026-09-28 16:07 — commit: docs: confirm public listing descriptions | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
+
+- 2026-09-28 16:20 — Corrected public Constellation 0.1.0/0.1.1 and Overpass 0.3.0 historical release notes in the authenticated Daniel Bally publisher dashboard. Independent review identified Overpass list abbreviation `NO SCENE` as ambiguous; beginning 0.3.3 label correction.
