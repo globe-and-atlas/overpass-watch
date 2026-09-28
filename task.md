@@ -42,6 +42,6 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] Pin-save failure returns a failure status.
 - [x] Release tests pass.
 - [x] Production PBW version matches listing version.
-- [ ] GitHub main contains committed source changes.
-- [ ] RePebble store contains the release.
-- [ ] Public app listing is verified.
+- [x] GitHub main contains committed source changes.
+- [x] RePebble store contains the release.
+- [x] Public app listing is verified.

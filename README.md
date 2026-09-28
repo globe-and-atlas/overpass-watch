@@ -23,6 +23,8 @@ FeatureCollection to copy (with a clear-all button). Pins never leave the phone 
 
 ## Install
 
+- [Install from the RePebble App Store](https://apps.repebble.com/6e920a2fa6304e45b4644116)
+- [Download the 0.2.0 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.2.0)
 - [Open in CloudPebble](https://cloudpebble.repebble.com/ide/import/github/globe-and-atlas/overpass-watch/main) (the branch is in the link because CloudPebble's import defaults to `master`)
 - Or build locally: `cd watchface && pebble build && pebble install --cloudpebble build/watchface.pbw`
 

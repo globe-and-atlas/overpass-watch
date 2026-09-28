@@ -103,15 +103,15 @@ def check_env(profile: str) -> None:
     env_example = ROOT / ".env.example"
 
     if env_example.exists():
-        check(".env exists", env_path.exists(),
+        example_keys = {
+            line.split("=")[0].strip()
+            for line in env_example.read_text().splitlines()
+            if line.strip() and not line.startswith("#") and "=" in line
+        }
+        check(".env present or no environment variables required", env_path.exists() or not example_keys,
               "run: cp .env.example .env" if not env_path.exists() else "")
 
-        if env_path.exists():
-            example_keys = {
-                line.split("=")[0].strip()
-                for line in env_example.read_text().splitlines()
-                if line.strip() and not line.startswith("#") and "=" in line
-            }
+        if env_path.exists() and example_keys:
             env_keys = {
                 line.split("=")[0].strip()
                 for line in env_path.read_text().splitlines()

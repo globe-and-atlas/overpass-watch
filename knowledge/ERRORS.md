@@ -36,3 +36,11 @@ Cause: save() swallowed localStorage failures; pin/clear still acknowledged succ
 - Lint cleanup initially removed a required global declaration from health-check counter function as well as unused main declaration. Restoring the counter declaration; lint caught this before execution.
 
 - Release package guard initially rejected the empty dev fixture because Webpack appends source-map footer comments. Guard updated to accept only an empty module export followed by comments.
+
+- Store GET /api/dashboard/apps/{id} returned 401 with SDK bearer authentication, although publication and developer lookup succeeded. Public listing verified in browser; inspection script now checks the unauthenticated public page and optional published PBW instead of dashboard GET.
+
+- GitHub CI: lint, typecheck, Python tests and JS tests passed; Project Health Audit failed. Inspecting remote audit output before declaring CI complete.
+
+- CI health root cause: template audit required .env even when .env.example contains no variable definitions. Fix: require .env only when example keys exist; regression test uses a clean temporary root with no .env.
+
+- Store verification follow-up had an extra import separator; Ruff caught it and auto-fix removed it.
