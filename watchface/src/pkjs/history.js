@@ -1,10 +1,11 @@
 // Past + future timeline for Overpass 0.3 (phone side, pure: node-tested in test/history.test.js).
 //
 // Past passes come from the same prediction model, matched to real scenes from Earth Search STAC —
-// the catalogue the model was validated against. Each past pass is SCENE (a scene exists; cloud is
-// the scene's eo:cloud_cover, whole-scene), PENDING (no scene yet, still inside the product lag) or
-// MISSED (no scene after the lag). Scenes with no predicted pass are listed as SCENE too.
-// See directives/build_watchapp.md, 0.3.0 contract H1-H13.
+// the catalogue used by the model's limited hindcast. Each past pass is SCENE (a scene exists;
+// cloud is the scene's eo:cloud_cover, whole-scene), PENDING (no scene yet, still inside the product
+// lag) or NO_MATCH (no matching scene in the queried Earth Search results after the lag). A missing
+// catalogue result is not proof that no acquisition occurred. Scenes with no predicted pass are listed.
+// See directives/build_watchapp.md, 0.3.x history contract H1-H13.
 
 var passes = require('./passes');
 
@@ -12,7 +13,7 @@ var DAY_MS = 86400000;
 var PAST_DAYS = 30;
 var WEAK_FORECAST_DAYS = 5;  // cloud forecasts beyond this have little skill
 var LAG_DAYS = { landsat: 16, sentinel: 2 };  // L2 product latency on Earth Search
-var FLAG = { EDGE: 1, PARTIAL: 2, SCENE: 4, PENDING: 8, MISSED: 16, WEAK: 32 };
+var FLAG = { EDGE: 1, PARTIAL: 2, SCENE: 4, PENDING: 8, NO_MATCH: 16, WEAK: 32 };
 var COLLECTIONS = ['landsat-c2-l2', 'sentinel-2-l2a'];
 
 var BY_PLATFORM = {};
@@ -89,7 +90,7 @@ function buildTimeline(predicted, scenes, nowMs) {
         e.cloud = scenes[i].cloud;
         used[i] = true;
       } else {
-        e.state = nowMs - p.timeMs < lagMs(p.platform) ? 'pending' : 'missed';
+        e.state = nowMs - p.timeMs < lagMs(p.platform) ? 'pending' : 'no_match';
       }
     }
     entries.push(e);
@@ -121,7 +122,7 @@ function flagsFor(e, nowMs) {
   if (e.state === 'scene') return FLAG.SCENE;
   var f = (e.confidence === 'edge' ? FLAG.EDGE : 0) | (e.partialPlan ? FLAG.PARTIAL : 0);
   if (e.state === 'pending') f |= FLAG.PENDING;
-  if (e.state === 'missed') f |= FLAG.MISSED;
+  if (e.state === 'no_match') f |= FLAG.NO_MATCH;
   if (e.state === 'future' && e.timeMs - nowMs > WEAK_FORECAST_DAYS * DAY_MS) f |= FLAG.WEAK;
   return f;
 }

@@ -42,12 +42,12 @@ def test_w6_js_pack_parses_in_c(harness):
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="needs node")
 def test_h10_timeline_flags_parse_in_c(harness):
-    """0.3 flags: SCENE with scene cloud, MISSED with partial plan, WEAK future, unknown distance."""
+    """Timeline flags distinguish scenes, catalogue no-matches, weak forecasts, and unknown distance."""
     now = 1790000000000
     script = (
         "const h=require('./src/pkjs/history');const now=" + str(now) + ", D=86400000;"
         "const tl=[{code:4,timeMs:now-4*D,distanceKm:101.9,confidence:'certain',partialPlan:false,state:'scene',cloud:3.2},"
-        "{code:2,timeMs:now-5*D,distanceKm:102.2,confidence:'edge',partialPlan:true,state:'missed',cloud:null},"
+        "{code:2,timeMs:now-5*D,distanceKm:102.2,confidence:'edge',partialPlan:true,state:'no_match',cloud:null},"
         "{code:0,timeMs:now-6*D,distanceKm:null,confidence:'certain',partialPlan:false,state:'scene',cloud:12},"
         "{code:1,timeMs:now+6*D,distanceKm:43.1,confidence:'certain',partialPlan:false,state:'future',cloud:null}];"
         "console.log(Buffer.from(h.packTimeline(tl,{},now)).toString('hex'))")
@@ -56,7 +56,7 @@ def test_h10_timeline_flags_parse_in_c(harness):
     s = now // 1000
     assert run(harness, "parse", hexdata) == [
         f"{s - 4 * 86400} 4 4 1019 3 S2C",          # SCENE, scene cloud 3 %
-        f"{s - 5 * 86400} 2 19 1022 -1 S2A",        # EDGE|PARTIAL|MISSED, no cloud
+        f"{s - 5 * 86400} 2 19 1022 -1 S2A",        # EDGE|PARTIAL|NO_MATCH, no cloud
         f"{s - 6 * 86400} 0 4 65535 12 L8",         # SCENE with no predicted pass
         f"{s + 6 * 86400} 1 32 431 -1 L9",          # WEAK future, no forecast in fixture
     ]

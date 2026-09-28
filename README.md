@@ -12,23 +12,25 @@ drop a timestamped **ground-truth pin** tagged with the nearest pass.
 | hold SELECT | refresh predictions |
 
 Each pass shows its countdown (`NOW`, `HH:MM`, `2d 04h`), local time, distance off the ground track,
-the cloud forecast for that hour, and a confidence flag:
+the cloud forecast for that hour, and a coverage indicator:
 
-- **IN SWATH**: inside the predicted swath with margin to spare; acquisition is not guaranteed.
+- **IN SWATH**: modelled cross-track distance falls within the nominal swath and its TLE-age buffer; this is a heuristic, not a probability or a guarantee of acquisition.
 - **EDGE**: near the swath edge (the margin grows 0.5 km per day of orbital-element age); may miss you.
 - **MAY NOT ACQUIRE**: Sentinel-2A runs a partial acquisition plan, so a pass isn't a guaranteed scene.
 
-**Pins** are exported from the app's settings page in the Pebble phone app, as a GeoJSON
-FeatureCollection to copy (with a clear-all button). Pins never leave the phone otherwise.
+**Pins** are stored in the phone app's local storage and exported from its settings page as a GeoJSON
+FeatureCollection to copy, with a clear-all button. Refresh uses the current location in requests to
+Open-Meteo and Element 84 Earth Search for local forecasts and scene history. Pin records are not
+included in those requests; they appear as GeoJSON only when you open the export page.
 
 ## Install
 
 - [Install from the RePebble App Store](https://apps.repebble.com/6e920a2fa6304e45b4644116)
-- [Download the 0.3.0 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.3.0)
+- [Download the 0.3.2 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.3.2)
 - [Open in CloudPebble](https://cloudpebble.repebble.com/ide/import/github/globe-and-atlas/overpass-watch/main) (the branch is in the link because CloudPebble's import defaults to `master`)
 - Or build locally: `cd watchface && pebble build && pebble install --cloudpebble build/watchface.pbw`
 
-## Past and future (0.3.0)
+## Past and future (0.3.2)
 
 UP scrolls back through the last 30 days, DOWN forward through the next 16; the default selection is
 the next pass. Past passes come from the same prediction model, matched (same satellite, within
@@ -37,7 +39,7 @@ the next pass. Past passes come from the same prediction model, matched (same sa
 - **SEEN**: a scene exists. Cloud is the scene's `eo:cloud_cover` for the whole scene, not the
   cloud over you; "low cloud" means ≤ 10 %.
 - **PROCESSING**: no scene yet, still inside the product lag (Landsat 16 days, Sentinel-2 2 days).
-- **NOT ACQUIRED**: no scene after the lag (often Sentinel-2A's partial plan).
+- **NO SCENE MATCH FOUND**: no matching result appeared in Earth Search after the expected product lag. This is a catalogue no-match, not proof that no acquisition occurred.
 - Scenes that match no predicted pass are listed too. Future cloud forecasts beyond 5 days show `~`.
 - Offline, a pass whose time has gone by reads **PASSED - NOT CHECKED** until the next refresh.
 
@@ -45,9 +47,10 @@ the next pass. Past passes come from the same prediction model, matched (same sa
 
 The phone predicts; the watch shows and pins.
 
-- `src/pkjs/passes.js` ports the pass model from [`../overpass`](../overpass), which was validated
-  against real Landsat/Sentinel-2 scenes (Earth Search STAC, 60 days, Houston/Denver/Nairobi/Madrid:
-  recall 100 %, certain-precision 100 %, timing 8-52 s). Orbits use vendored
+- `src/pkjs/passes.js` ports the pass model from [`../overpass`](../overpass). A 60-day hindcast at
+  Houston, Denver, Nairobi, and Madrid found 100% recall and 100% precision among the model's
+  in-swath subset, with matched-scene timing 8–52 seconds from prediction. This small sample does not
+  establish performance at other locations or future dates. Orbits use vendored
   [satellite.js](https://github.com/shashwatak/satellite-js) 4.1.4 (MIT) with CelesTrak TLEs, cached 6 h.
 - The JS output is tested against the Python reference on frozen TLEs (same passes, ±5 s, ±2 km, same
   confidence). A 16-day prediction takes ~160 ms in node.

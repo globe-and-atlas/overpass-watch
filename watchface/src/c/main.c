@@ -161,11 +161,9 @@ static const char *pass_state(const Pass *p, uint32_t now, GColor *color) {
     *color = GColorLiberty;
     return p->platform <= 1 ? "PROCESSING (LANDSAT ~2 WK)" : "PROCESSING";
   }
-  if (p->flags & PASS_MISSED) {
-    *color = GColorOrange;
-    return (p->flags & PASS_PARTIAL) ? "NOT ACQUIRED (S2A PLAN)"
-         : (p->flags & PASS_EDGE)    ? "NOT ACQUIRED (EDGE)"
-                                     : "NOT ACQUIRED";
+  if (p->flags & PASS_NO_MATCH) {
+    *color = GColorLightGray;
+    return "NO SCENE MATCH FOUND";
   }
   if ((p->flags & PASS_EDGE) && (p->flags & PASS_PARTIAL)) {
     *color = GColorOrange;
@@ -229,7 +227,7 @@ static void draw_list(GContext *ctx, uint32_t now) {
       graphics_context_set_stroke_color(ctx, AMBER);
       graphics_draw_line(ctx, GPoint(4, r.origin.y), GPoint(196, r.origin.y));
     }
-    char when[20], line[40], tag[8];
+    char when[20], line[40], tag[12];
     time_t t = p->time;
     strftime(when, sizeof(when), clock_is_24h_style() ? "%d %b %H:%M" : "%d %b %I:%M%p", localtime(&t));
     GColor color = GColorWhite;
@@ -242,9 +240,9 @@ static void draw_list(GContext *ctx, uint32_t now) {
     } else if (p->flags & PASS_PENDING) {
       snprintf(tag, sizeof(tag), "WAIT");
       color = GColorLiberty;
-    } else if (p->flags & PASS_MISSED) {
-      snprintf(tag, sizeof(tag), "MISS");
-      color = GColorOrange;
+    } else if (p->flags & PASS_NO_MATCH) {
+      snprintf(tag, sizeof(tag), "NO SCENE");
+      color = GColorLightGray;
     } else {
       cloud_text(p, tag, sizeof(tag));
       if (p->flags & (PASS_EDGE | PASS_PARTIAL)) color = GColorLightGray;

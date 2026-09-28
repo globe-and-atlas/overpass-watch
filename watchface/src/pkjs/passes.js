@@ -1,9 +1,9 @@
 // Pass prediction for Overpass (phone side). A port of ../overpass/execution/passes_core.py, which was
-// validated against real Landsat/Sentinel-2 scenes (recall 100 %, certain-precision 100 %, 4 sites).
+// hindcast-compared with Landsat/Sentinel-2 scene listings at four sampled sites; those sample scores are not a general accuracy guarantee.
 // Pure: no Pebble APIs, so node tests compare it with the Python reference on the same TLEs.
 //
 // A pass is a daylight closest approach of the sub-satellite point to the target within half the
-// swath. Passes within the TLE-age drift margin of the swath edge are "edge" (may miss the target).
+// swath. Passes are "edge" near the swath boundary after a simple TLE-age drift buffer; this is a geometric heuristic, not a probability.
 
 var sat = require('./satellite');
 

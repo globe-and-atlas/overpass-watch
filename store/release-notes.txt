@@ -1,1 +1,1 @@
-0.3.1: Updated high-resolution store icons and live telemetry screenshots on the RePebble store.
+0.3.2: Clarifies location use, reports catalogue no-matches without claiming non-acquisition, and narrows the scope of the pass hindcast results.

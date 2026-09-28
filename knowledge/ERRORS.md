@@ -2,6 +2,12 @@
 
 Record deterministic errors, root causes, and fixes here.
 
+## 2026-09-28 patch context mismatch
+- Error: A multi-file `apply_patch` did not apply because the Store description's privacy sentence was part of a longer paragraph, not a standalone line.
+- Cause: Patch context assumed a line break that the source file did not contain.
+- Fix: No files from the failed patch were changed; inspect and patch the exact paragraph as stored.
+- Graduated to: future Store-copy patches must use the literal current paragraph as context.
+
 ## 2026-09-28 review findings (unfixed)
 - Phone pin persistence: save catches localStorage errors without returning failure; pin then sends SAVED. Storage quota or write failure can silently lose a pin.
 - Emulator W9: amber footer pixels also match PINNING or PIN FAILED; test does not establish a saved pin or incremented count.
@@ -44,3 +50,4 @@ Cause: save() swallowed localStorage failures; pin/clear still acknowledged succ
 - CI health root cause: template audit required .env even when .env.example contains no variable definitions. Fix: require .env only when example keys exist; regression test uses a clean temporary root with no .env.
 
 - Store verification follow-up had an extra import separator; Ruff caught it and auto-fix removed it.
+- 2026-09-28: Constellation validation commands were first run with incorrect working-directory assumptions and the Node harness omitted a PebbleKit global stub; corrected by adding the stub and using project-relative paths, after which focused JS tests and a clean emery build passed.

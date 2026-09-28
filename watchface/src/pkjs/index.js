@@ -1,6 +1,7 @@
 // Phone side of Overpass: locate, fetch TLEs and cloud forecast, predict passes (passes.js), send them
 // to the watch; record ground-truth pins as GeoJSON in localStorage and export them from the app's
-// settings page. Pins and home never leave the phone.
+// settings page. Pin records stay local; refresh sends current coordinates to Open-Meteo and
+// Element 84 Earth Search to fetch location-specific forecasts and scene history.
 
 var passes = require('./passes');
 var history = require('./history');

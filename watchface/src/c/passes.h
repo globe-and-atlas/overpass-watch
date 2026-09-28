@@ -10,9 +10,9 @@
 #define PASS_PARTIAL 2  // satellite on a partial acquisition plan (Sentinel-2A)
 #define PASS_SCENE 4    // past: a real scene exists; cloud = the scene's cloud cover (whole scene)
 #define PASS_PENDING 8  // past: no scene yet, still inside the product lag
-#define PASS_MISSED 16  // past: no scene and the lag has elapsed
+#define PASS_NO_MATCH 16  // past: no matching Earth Search scene after the product-lag window
 #define PASS_WEAK 32    // future pass > 5 days out: cloud forecast has little skill
-#define PASS_PAST (PASS_SCENE | PASS_PENDING | PASS_MISSED)
+#define PASS_PAST (PASS_SCENE | PASS_PENDING | PASS_NO_MATCH)
 #define PASS_DIST_UNKNOWN 65535  // scene with no predicted pass
 #define PASS_NOW_S 120  // within +-2 min counts as "NOW"
 

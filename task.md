@@ -54,3 +54,33 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] Fresh verifier: APPROVE WITH NITS; fixed low-cloud wording, offline passed/stale-pending states, ±30 min scene matching, version, pin state, scene flag doubt.
 - [x] Ruff, mypy, health: no failures.
 - [ ] Physical watch: past list with live catalogue over real GPS.
+
+## Accuracy and privacy correction — 0.3.2
+
+### Contract
+- Target directive: `directives/build_watchapp.md`.
+- Intended execution scripts: `execution/render_map.py`, `execution/render_store.py`, `execution/publish_release.py`, `execution/release_store.py`.
+- Expected artifacts: corrected app source and copy, production PBW, inspected emulator renders, GitHub commit/release, updated RePebble listing.
+- Safety: preserve existing user changes; do not read or commit secrets, `.env`, or `.tmp/` artifacts.
+- Publication: user explicitly authorized updating GitHub and RePebble editions.
+
+### Validation Contract
+- Store and README copy disclose that current coordinates are sent to Open-Meteo and Earth Search during refresh.
+- Historical no-match status says no scene was found in the queried catalogue and does not assert non-acquisition.
+- Pass confidence copy describes the swath-margin heuristic without implying a probability or guarantee.
+- README install version and production PBW version both equal the package version.
+- Production `dev.json` is empty.
+- JavaScript prediction and history tests pass.
+- Python and host-C tests pass.
+- Pebble emery production build succeeds.
+- Emulator renders for map, selected pass, past history, list, and pin confirmation are inspected.
+- Fresh verifier approves the final source, copy, and renders.
+- GitHub commit and release point to the verified production PBW.
+- RePebble public PBW bytes match the verified production PBW.
+
+### Checklist
+- [ ] Correct user-visible labels and privacy copy.
+- [ ] Align directive and README with observed behavior.
+- [ ] Run tests, build, and render review.
+- [ ] Run an independent verifier.
+- [ ] Commit and update GitHub/RePebble editions.

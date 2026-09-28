@@ -22,7 +22,7 @@ test('H1 past pass with a same-platform same-date scene is SCENE with scene clou
 test('H1 a scene on another platform the same day does not match', () => {
   const t = NOW - 4 * DAY;
   const tl = h.buildTimeline([pass('sentinel-2c', 4, t)], h.groupScenes([scene('sentinel-2b', iso(t), 3)]), NOW);
-  assert.strictEqual(tl.find(e => e.platform === 'sentinel-2c').state, 'missed');
+  assert.strictEqual(tl.find(e => e.platform === 'sentinel-2c').state, 'no_match');
 });
 
 test('H2 several tiles on one platform-date collapse to the lowest cloud', () => {
@@ -44,13 +44,13 @@ test('verifier #3: one datatake matches one pass, not two passes the same day', 
   const t1 = NOW - 20 * DAY, t2 = t1 + 100 * 60000;  // past Landsat's 16-day lag; 100 min apart
   const tl = h.buildTimeline([pass('landsat-8', 0, t1), pass('landsat-8', 0, t2)],
                              h.groupScenes([scene('landsat-8', iso(t1 + 5000), 20)]), NOW);
-  assert.deepStrictEqual(tl.map(e => e.state), ['scene', 'missed']);
+  assert.deepStrictEqual(tl.map(e => e.state), ['scene', 'no_match']);
 });
 
 test('verifier #3: a scene more than 30 min from any pass is its own entry', () => {
   const t = NOW - 20 * DAY;
   const tl = h.buildTimeline([pass('landsat-8', 0, t)], h.groupScenes([scene('landsat-8', iso(t + 45 * 60000), 20)]), NOW);
-  assert.deepStrictEqual(tl.map(e => e.state), ['missed', 'scene']);
+  assert.deepStrictEqual(tl.map(e => e.state), ['no_match', 'scene']);
 });
 
 test('verifier #6: a real scene clears the edge / partial-plan doubt flags', () => {
@@ -64,9 +64,9 @@ test('H3 no scene inside the lag is PENDING (Landsat 16 d, Sentinel-2 2 d)', () 
   assert.deepStrictEqual(tl.map(e => e.state), ['pending', 'pending']);
 });
 
-test('H4 no scene after the lag is MISSED', () => {
+test('H4 no scene after the lag is an Earth Search no-match', () => {
   const tl = h.buildTimeline([pass('landsat-9', 1, NOW - 20 * DAY), pass('sentinel-2a', 2, NOW - 5 * DAY)], [], NOW);
-  assert.deepStrictEqual(tl.map(e => e.state), ['missed', 'missed']);
+  assert.deepStrictEqual(tl.map(e => e.state), ['no_match', 'no_match']);
 });
 
 test('H5 a scene with no predicted pass still appears as SCENE', () => {
@@ -88,8 +88,8 @@ test('H7 past entries never carry a forecast cloud', () => {
   const tl = h.buildTimeline([pass('landsat-9', 1, t)], [], NOW);
   const forecast = {}; forecast[require('../src/pkjs/passes').hourKey(t)] = 55;
   const b = h.packTimeline(tl, forecast, NOW);
-  assert.strictEqual(b[8], 0xFF, 'missed pass must show no cloud, not the forecast');
-  assert.strictEqual(b[5] & h.FLAG.MISSED, h.FLAG.MISSED);
+  assert.strictEqual(b[8], 0xFF, 'no-match pass must show no cloud, not the forecast');
+  assert.strictEqual(b[5] & h.FLAG.NO_MATCH, h.FLAG.NO_MATCH);
 });
 
 test('H8 over the cap, oldest past entries go first, never future ones', () => {
@@ -105,7 +105,7 @@ test('H8 over the cap, oldest past entries go first, never future ones', () => {
 test('H10 flag bits pack into byte 5 alongside edge/partial', () => {
   const tl = h.buildTimeline([pass('sentinel-2a', 2, NOW - 5 * DAY, { confidence: 'edge' })], [], NOW);
   const b = h.packTimeline(tl, {}, NOW);
-  assert.strictEqual(b[5], h.FLAG.EDGE | h.FLAG.PARTIAL | h.FLAG.MISSED);
+  assert.strictEqual(b[5], h.FLAG.EDGE | h.FLAG.PARTIAL | h.FLAG.NO_MATCH);
 });
 
 test('H10 unknown distance packs as 0xFFFF', () => {

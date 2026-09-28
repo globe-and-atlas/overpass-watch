@@ -8,8 +8,8 @@ timestamp: "2026-09-28T06:40:10.130770-05:00"
 Agent: OpenAI Codex (GPT-6)
 Handoff-from: OpenAI Codex
 Handoff-type: continuation
-Goal: Commit all changes and publish GitHub/RePebble app store release.
-Status: Published 0.2.0; public listing and download verified.
+Goal: Correct Overpass privacy and historical-status claims; update GitHub and RePebble editions.
+Status: In progress — validation contract recorded; source and release-copy review underway.
 
 GitHub release: https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.2.0
 Store: https://apps.repebble.com/6e920a2fa6304e45b4644116
@@ -26,3 +26,5 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 09:04 — commit: feat: Overpass 0.3.0 — past + future timeline | README.md,directives/build_watchapp.md,execution/publish_release.py,execution/render_store.py,knowledge/SESSION.md
 - 2026-09-28 09:07 — commit: docs: record 0.3.0 publication | knowledge/SESSION.md,knowledge/procedural/publish_release.md
 - 2026-09-28 14:28 — release: Overpass 0.3.1 — update store icons and live screenshots, publish to RePebble
+- 2026-09-28 14:30 — commit: chore: Overpass 0.3.1 — update store icons and live screenshots | knowledge/SESSION.md,store/emery_list.png,store/emery_map.png,store/emery_past.png,store/release-notes.txt
+- 2026-09-28 14:52 — release: Overpass 0.3.2 — publish 0.3.2 with privacy/accuracy updates and fresh screenshots to RePebble

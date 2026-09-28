@@ -81,3 +81,11 @@ pass > 5 days out: forecast has little skill). PASS_MAX 40 → 64.
 | H11 | Default selection is the next future pass, not a past one | code review + emulator |
 | H12 | Emulator: list shows past entries above a NOW divider and future below | emulator screenshot |
 | H13 | Catalogue failure keeps the future half working (past half empty, status says so) | node |
+
+## 2026-09-28 accuracy/privacy correction — 0.3.2
+
+The historical status `NO_MATCH` means no matching item appeared in the queried Element 84 Earth Search result after the expected product-lag interval. It does not establish that the satellite did not acquire imagery. The UI and Store copy must retain this distinction.
+
+Location use: refresh sends current coordinates to Open-Meteo for cloud forecasts and Element 84 Earth Search for scene history. GeoJSON pin records remain phone-side and are excluded from those requests; the user explicitly opens the settings export page to view/copy them.
+
+The in-swath/edge status is a TLE-age/swath-margin heuristic, not a probability. The 60-day, four-location hindcast is a limited sample and must not be presented as global or future-performance validation.
