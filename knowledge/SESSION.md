@@ -38,3 +38,4 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 16:05 — authenticated dashboard is Daniel Bally and lists both existing apps. Corrected Overpass description persists on editor reload, but cache-busted public app page still serves older short copy; save-to-store propagation unverified.
 - 2026-09-28 16:03 — commit: docs: track listing propagation gap | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
 - 2026-09-28 16:10 — public Overpass page now displays the 30-day catalogue history, no-match caveat, forecast/swath heuristic limits, and coordinate-use disclosure; verified in browser.
+- 2026-09-28 16:07 — commit: docs: confirm public listing descriptions | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
