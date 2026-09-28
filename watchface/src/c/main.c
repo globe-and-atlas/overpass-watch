@@ -6,6 +6,7 @@
 #include <pebble.h>
 
 #include "passes.h"
+#include "map.h"
 
 #define AMBER GColorChromeYellow
 #define LIST_ROWS 4
@@ -20,6 +21,8 @@
 
 static Window *s_window;
 static Layer *s_canvas;
+static Layer *s_map_layer;
+static bool s_map_view = true;
 static GFont s_f14, s_f18, s_f24, s_f28;
 
 static Pass s_passes[PASS_MAX];
@@ -66,6 +69,7 @@ static void clear_status(void *ctx) {
   s_status_timer = NULL;
   s_status[0] = '\0';
   layer_mark_dirty(s_canvas);
+  if (s_map_layer) layer_mark_dirty(s_map_layer);
 }
 
 static void set_status(const char *text) {
@@ -97,10 +101,12 @@ static void on_inbox(DictionaryIterator *it, void *ctx) {
     persist_passes(t->value->data, s_count * PASS_BYTES);
     s_auto = true;
     follow_next();
+    map_receive(it, s_count, s_generated);
   }
   if ((t = dict_find(it, MESSAGE_KEY_PINS))) s_pins = t->value->int32;
   if ((t = dict_find(it, MESSAGE_KEY_STATUS))) set_status(t->value->cstring);
   layer_mark_dirty(s_canvas);
+  layer_mark_dirty(s_map_layer);
 }
 
 static void on_outbox_failed(DictionaryIterator *it, AppMessageResult reason, void *ctx) {
@@ -115,7 +121,7 @@ static void text(GContext *ctx, const char *s, GFont f, GRect r, GColor c, GText
 }
 
 static void draw_hero(GContext *ctx, const Pass *p, uint32_t now) {
-  char buf[32];
+  char buf[48];
   text(ctx, passes_platform_name(p->platform), s_f24, GRect(4, 16, 192, 28), GColorWhite, GTextAlignmentLeft);
 
   passes_countdown((int32_t)(p->time - now), buf, sizeof(buf));
@@ -131,7 +137,7 @@ static void draw_hero(GContext *ctx, const Pass *p, uint32_t now) {
   snprintf(buf, sizeof(buf), "%d KM OFF TRACK  CLOUD %s", p->dist10 / 10, cloud);
   text(ctx, buf, s_f14, GRect(4, 98, 192, 16), AMBER, GTextAlignmentLeft);
 
-  const char *flag = "CERTAIN";
+  const char *flag = "IN SWATH";
   GColor color = GColorCyan;
   if ((p->flags & PASS_EDGE) && (p->flags & PASS_PARTIAL)) {
     flag = "EDGE - MAY NOT ACQUIRE";
@@ -182,21 +188,38 @@ static void canvas_update(Layer *layer, GContext *ctx) {
   text(ctx, clock, s_f14, GRect(100, 0, 96, 16), GColorWhite, GTextAlignmentRight);
 
   if (s_count > 0) {
-    draw_hero(ctx, &s_passes[s_sel], now);
+    if (s_map_view) {
+      const Pass *p = &s_passes[s_sel];
+      char buf[48], when[24], cloud[8];
+      text(ctx, passes_platform_name(p->platform), s_f24, GRect(4, 16, 192, 28), GColorWhite, GTextAlignmentLeft);
+      passes_countdown((int32_t)(p->time - now), buf, sizeof(buf));
+      text(ctx, buf, s_f24, GRect(4, 40, 95, 27), GColorCyan, GTextAlignmentLeft);
+      time_t pt = p->time;
+      strftime(when, sizeof(when), "%d %b %H:%M", localtime(&pt));
+      text(ctx, when, s_f14, GRect(94, 49, 102, 16), GColorWhite, GTextAlignmentRight);
+      if (p->cloud >= 0) snprintf(cloud, sizeof(cloud), "%d%%", p->cloud);
+      else snprintf(cloud, sizeof(cloud), "--");
+      snprintf(buf, sizeof(buf), "CLOUD %s  %s", cloud, p->flags & PASS_PARTIAL ? "PLAN LIMITED" : p->flags & PASS_EDGE ? "EDGE" : "IN SWATH");
+      text(ctx, buf, s_f14, GRect(4, 189, 192, 16), p->flags ? AMBER : GColorCyan, GTextAlignmentLeft);
+    } else {
+      draw_hero(ctx, &s_passes[s_sel], now);
     graphics_context_set_stroke_color(ctx, GColorDarkGray);
     graphics_draw_line(ctx, GPoint(4, 132), GPoint(196, 132));
     draw_list(ctx);
+    }
   } else {
     text(ctx, "NO PASSES YET", s_f24, GRect(4, 70, 192, 28), GColorWhite, GTextAlignmentCenter);
     text(ctx, "HOLD SELECT TO REFRESH", s_f14, GRect(4, 100, 192, 16), GColorLightGray, GTextAlignmentCenter);
   }
+  layer_set_hidden(s_map_layer, !s_map_view || s_count == 0);
 
   char foot[40];
   if (s_status[0]) {
     snprintf(foot, sizeof(foot), "%s", s_status);
   } else {
     int age_h = s_generated ? (int)((now - s_generated) / 3600) : -1;
-    snprintf(foot, sizeof(foot), age_h > 12 ? "PINS %d  DATA %dH OLD" : "PINS %d  SELECT = PIN", s_pins, age_h);
+    if (age_h > 12) snprintf(foot, sizeof(foot), "PINS %d  DATA %dH OLD", s_pins, age_h);
+    else snprintf(foot, sizeof(foot), "PIN %d  HOLD DOWN: %s", s_pins, s_map_view ? "LIST" : "MAP");
   }
   text(ctx, foot, s_f14, GRect(4, 208, 192, 16), s_status[0] ? AMBER : GColorLightGray, GTextAlignmentLeft);
 }
@@ -207,12 +230,20 @@ static void up(ClickRecognizerRef r, void *ctx) {
   if (s_sel > 0) s_sel--;
   s_auto = false;
   layer_mark_dirty(s_canvas);
+  layer_mark_dirty(s_map_layer);
 }
 
 static void down(ClickRecognizerRef r, void *ctx) {
   if (s_sel < s_count - 1) s_sel++;
   s_auto = false;
   layer_mark_dirty(s_canvas);
+  layer_mark_dirty(s_map_layer);
+}
+
+static void toggle_map(ClickRecognizerRef r, void *ctx) {
+  s_map_view = !s_map_view;
+  layer_mark_dirty(s_canvas);
+  layer_mark_dirty(s_map_layer);
 }
 
 static void select_click(ClickRecognizerRef r, void *ctx) {
@@ -227,6 +258,7 @@ static void select_long(ClickRecognizerRef r, void *ctx) {
 static void click_config(void *ctx) {
   window_single_click_subscribe(BUTTON_ID_UP, up);
   window_single_click_subscribe(BUTTON_ID_DOWN, down);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 700, toggle_map, NULL);
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click);
   window_long_click_subscribe(BUTTON_ID_SELECT, 700, select_long, NULL);
 }
@@ -234,19 +266,28 @@ static void click_config(void *ctx) {
 static void on_tick(struct tm *t, TimeUnits changed) {
   follow_next();
   layer_mark_dirty(s_canvas);
+  layer_mark_dirty(s_map_layer);
 }
 
 // ---- lifecycle ----------------------------------------------------------------------------
+
+static void map_update(Layer *layer, GContext *ctx) {
+  if (s_count) map_draw(ctx, s_sel, s_passes[s_sel].flags);
+}
 
 static void window_load(Window *w) {
   Layer *root = window_get_root_layer(w);
   s_canvas = layer_create(layer_get_bounds(root));
   layer_set_update_proc(s_canvas, canvas_update);
   layer_add_child(root, s_canvas);
+  s_map_layer = layer_create(GRect(4, 68, 192, 120));
+  layer_set_update_proc(s_map_layer, map_update);
+  layer_add_child(root, s_map_layer);
 }
 
 static void window_unload(Window *w) {
   layer_destroy(s_canvas);
+  layer_destroy(s_map_layer);
 }
 
 static void init(void) {
@@ -255,6 +296,7 @@ static void init(void) {
   s_f24 = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
   s_f28 = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
   restore_passes();
+  map_restore(s_count, s_generated);
   follow_next();
 
   s_window = window_create();
@@ -266,7 +308,7 @@ static void init(void) {
   tick_timer_service_subscribe(MINUTE_UNIT, on_tick);
   app_message_register_inbox_received(on_inbox);
   app_message_register_outbox_failed(on_outbox_failed);
-  app_message_open(1024, 64);
+  app_message_open(3072, 64);
 }
 
 static void deinit(void) {

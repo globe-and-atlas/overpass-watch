@@ -1,0 +1,1 @@
+0.2.0: Adds the regional map, observer marker, selected satellite ground track, nominal imaging swath, and offline map cache. Hold DOWN switches between map and list. Pin-save and clear operations now report storage failures instead of falsely confirming success.

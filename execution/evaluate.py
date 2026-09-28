@@ -89,7 +89,7 @@ def main() -> None:
     try:
         import importlib
         mod = importlib.import_module(target_module)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - evaluation must report arbitrary target failures
         print(json.dumps({
             "score": 0.0,
             "reasoning": f"Import error (likely bad {target_module}.py): {exc}",
@@ -100,7 +100,7 @@ def main() -> None:
     try:
         output = mod.your_function(fixture)  # TODO: replace with real function call
         score, reasoning = score_output(output)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - evaluation must report arbitrary target failures
         print(json.dumps({
             "score": 0.0,
             "reasoning": f"Eval error: {exc}",

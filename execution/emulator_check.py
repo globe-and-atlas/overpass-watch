@@ -28,7 +28,7 @@ CYAN = (0, 255, 255)
 
 
 def run(args: list[str], timeout: int = 240) -> subprocess.CompletedProcess:
-    return subprocess.run(args, cwd=WATCH, capture_output=True, text=True, timeout=timeout)
+    return subprocess.run(args, cwd=WATCH, capture_output=True, text=True, timeout=timeout, check=False)
 
 
 def shot(name: str) -> Image.Image:
@@ -46,7 +46,7 @@ def boot() -> None:
     """Clean start: stale QEMU state shows the wrong app (see workspace _PEBBLE skill)."""
     run(["pebble", "kill"])
     for proc in ("pypkjs", "qemu-pebble"):
-        subprocess.run(["pkill", "-f", proc], capture_output=True)
+        subprocess.run(["pkill", "-f", proc], capture_output=True, check=False)
     time.sleep(3)
 
 
@@ -76,6 +76,9 @@ def main() -> int:
             print("Overpass never came to the foreground", file=sys.stderr)
             return 1
         time.sleep(20)  # TLEs + prediction + cloud forecast
+        # Map is now the default screen; legacy list checks explicitly select list mode.
+        run(["pebble", "emu-button", "--emulator", "emery", "--duration", "900", "click", "down"])
+        time.sleep(1)
         img = shot("1_list")
         results["W8 passes listed (cyan countdown/flags present)"] = count(img, CYAN, (0, 40, 200, 132)) > 20
         results["W8 list rows drawn"] = count(img, (255, 255, 255), (0, 136, 200, 206)) > 50

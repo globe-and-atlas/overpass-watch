@@ -64,8 +64,8 @@ failures_count = 0
 
 
 def check(label: str, ok: bool, message: str = "", warning: bool = False) -> bool:
-    """Print a check result. Returns True if passed."""
     global warnings_count, failures_count
+    """Print a check result. Returns True if passed."""
     icon = PASS if ok else (WARN if warning else FAIL)
     suffix = f"  {message}" if message else ""
     print(f"  {icon}  {label}{suffix}")
@@ -150,7 +150,7 @@ def check_secrets() -> None:
     try:
         staged = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
-            cwd=ROOT, capture_output=True, text=True,
+            cwd=ROOT, capture_output=True, text=True, check=False,
         ).stdout.splitlines()
         env_staged = any(".env" == Path(f).name and f != ".env.example" for f in staged)
         check(".env not staged for commit", not env_staged,
@@ -173,12 +173,12 @@ def check_secrets() -> None:
                     ["grep", "-r", "--include=*.py", "--include=*.ts",
                      "--include=*.js", "--include=*.jsx", "--include=*.tsx",
                      "-l", "-E", pattern] + [str(d) for d in scan_dirs],
-                    capture_output=True, text=True,
+                    capture_output=True, text=True, check=False,
                 )
                 if result.stdout.strip():
                     found_secrets.append(f"{label} in {result.stdout.strip()}")
-            except Exception:
-                pass
+            except (OSError, subprocess.SubprocessError) as exc:
+                found_secrets.append(f"Secret scan could not complete: {exc}")
         check("No hardcoded secret patterns in src/execution/", not found_secrets,
               "; ".join(found_secrets) if found_secrets else "")
 
@@ -288,7 +288,7 @@ def check_tests(profile: str) -> None:
         try:
             result = subprocess.run(
                 ["python3", "-m", "pytest", "tests/", "-q", "--tb=short"],
-                cwd=ROOT, capture_output=True, text=True, timeout=60,
+                cwd=ROOT, capture_output=True, text=True, check=False, timeout=60,
             )
             passed = result.returncode == 0
             summary = result.stdout.strip().splitlines()[-1] if result.stdout.strip() else "no output"
@@ -302,7 +302,6 @@ def check_tests(profile: str) -> None:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    global warnings_count, failures_count
 
     parser = argparse.ArgumentParser(description="Profile-aware project health check")
     parser.add_argument("--strict", action="store_true", help="Fail on warnings too")
@@ -329,7 +328,6 @@ def main() -> None:
     check_tests(profile)
 
     print(f"\n{'─'*52}")
-    total = failures_count + warnings_count
     if failures_count:
         print(f"  {FAIL}  {failures_count} failure(s), {warnings_count} warning(s)")
     elif warnings_count:

@@ -3,6 +3,7 @@
 // settings page. Pins and home never leave the phone.
 
 var passes = require('./passes');
+var map = require('./map');
 var dev = require('./dev.json');  // emulator fixture: {"lat": .., "lon": ..}; ships as {}
 
 var CELESTRAK = 'https://celestrak.org/NORAD/elements/gp.php?FORMAT=TLE&CATNR=';
@@ -24,7 +25,13 @@ function load(key, fallback) {
 }
 
 function save(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { console.log('save ' + key + ': ' + e); }
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.log('save ' + key + ': ' + e);
+    return false;
+  }
 }
 
 function pins() { return load('pins', []); }
@@ -108,6 +115,10 @@ function refresh() {
           PASSES: passes.packPasses(list, clouds, MAX_PASSES),
           GENERATED: Math.round(now / 1000),
           PINS: pins().length,
+          MAP_LAND: map.packLand(c.latitude, c.longitude),
+          MAP_TRACKS: map.packTracks(tles, list, c.latitude, c.longitude, MAX_PASSES),
+          MAP_LOCATION: Math.abs(c.latitude).toFixed(2) + (c.latitude < 0 ? 'S ' : 'N ') +
+            Math.abs(c.longitude).toFixed(2) + (c.longitude < 0 ? 'W' : 'E'),
           STATUS: list.length ? '' : 'NO PASS 16 D'
         });
       });
@@ -136,12 +147,13 @@ function pin() {
         minutes_from_pass: nearest ? Math.round((now - nearest.timeMs) / 60000) : null
       }
     });
-    save('pins', all);
+    if (!save('pins', all)) return status('PIN FAILED: STORAGE');
     send({ PINS: all.length, STATUS: 'PIN ' + all.length + ' SAVED +-' + Math.round(c.accuracy || 0) + ' M' });
   });
 }
 
-Pebble.addEventListener('ready', refresh);
+// Emulator-only offline fixture proves the watch restores its cached map without phone updates.
+Pebble.addEventListener('ready', function () { if (!dev.offline) refresh(); });
 
 Pebble.addEventListener('appmessage', function (e) {
   var cmd = e.payload.CMD;
@@ -164,7 +176,7 @@ Pebble.addEventListener('showConfiguration', function () {
 
 Pebble.addEventListener('webviewclosed', function (e) {
   if (e && e.response === 'clear') {
-    save('pins', []);
+    if (!save('pins', [])) return status('CLEAR FAILED: STORAGE');
     send({ PINS: 0, STATUS: 'PINS CLEARED' });
   }
 });

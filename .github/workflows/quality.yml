@@ -32,5 +32,13 @@ jobs:
       - name: Run tests
         run: make test
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Test phone prediction, map and pin storage
+        working-directory: watchface
+        run: node --test test/*.test.js
+
       - name: Project Health Audit
         run: make health

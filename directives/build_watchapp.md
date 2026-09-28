@@ -43,3 +43,12 @@ Edge cases: no location (show "NO FIX"), network down (keep last passes, show da
 in 16 days (show "NO PASS 16 D"), GPS unavailable for a pin ("PIN FAILED: NO GPS").
 
 ## Learnings
+
+## 2026-09-27 Map extension
+Default view: north-up regional map, observer centered, selected orbit ground track, nominal swath. Preserve short UP/DOWN selection, SELECT pin, hold SELECT refresh. Hold DOWN toggles map/list. Geometry is generated on the phone from the same TLEs and location used for prediction; bounded payload includes geographic land outlines. Offline map must correspond to cached predictions. See task.md Map feature contract for binary assertions.
+Execution: execution/build_map_data.py, execution/render_review.py; node map tests and pytest. Renders in .tmp/emulator/. No secrets read or committed; no publication requested.
+
+## 2026-09-28 Publication
+User explicitly requested commit, GitHub push and RePebble app store publication. This supersedes the earlier pending demand-test release gate. Publish truthful regional-map/nominal-swath description and note hardware validation remains open. Acceptance conditions are in task.md Publish 0.2.0. Fix known false pin-save acknowledgement before publication.
+
+Publication scripts: execution/publish_release.py (PBW guard and SDK publish), execution/release_store.py (read-only metadata), execution/create_store_assets.swift (native vector icon), execution/render_map.py (screenshots).

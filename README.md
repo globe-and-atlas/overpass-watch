@@ -7,13 +7,14 @@ drop a timestamped **ground-truth pin** tagged with the nearest pass.
 | Button | Action |
 |---|---|
 | UP / DOWN | select a pass |
+| hold DOWN | switch between the map and the pass list |
 | SELECT | drop a ground-truth pin (location and time saved on the phone, tagged with the nearest pass) |
 | hold SELECT | refresh predictions |
 
 Each pass shows its countdown (`NOW`, `HH:MM`, `2d 04h`), local time, distance off the ground track,
 the cloud forecast for that hour, and a confidence flag:
 
-- **CERTAIN**: inside the swath with margin to spare.
+- **IN SWATH**: inside the predicted swath with margin to spare; acquisition is not guaranteed.
 - **EDGE**: near the swath edge (the margin grows 0.5 km per day of orbital-element age); may miss you.
 - **MAY NOT ACQUIRE**: Sentinel-2A runs a partial acquisition plan, so a pass isn't a guaranteed scene.
 
@@ -57,6 +58,24 @@ python3 execution/emulator_check.py                # emulator: list + pin (needs
 
 Data: CelesTrak (TLEs), Open-Meteo (cloud cover, CC BY 4.0). Prediction validated with Element 84
 Earth Search.
+
+## Regional map
+
+The default screen is a north-up 800 × 500 km overview centered on the location used for the
+predictions. The amber **YOU** dot marks that prediction location, the white line is the selected
+satellite's local ground-track tangent at closest approach, and the stippled corridor shows its
+nominal imaging swath. Cyan edges mean in-swath; amber edges flag an edge or partial acquisition
+plan. Land is green and water is blue. The map has a 100 km scale bar.
+
+The regional equirectangular projection is an overview, not an exact scene footprint. Above 80°
+north/south, the map reports unavailable; the pass list remains usable. Land outlines come from
+[Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/) (1:110m, public domain), bundled
+on the phone with no map-service request. Refresh updates the map center; this is not live navigation.
+The watch caches the map with its corresponding predictions for use without the phone.
+
+Rebuild bundled land data: `python3 execution/build_map_data.py`.
+Map tests: `cd watchface && node --test test/map.test.js`.
+Emulator capture: `python3 execution/render_map.py` (public Houston fixture; restores production build).
 
 ---
 

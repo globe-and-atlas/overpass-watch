@@ -1,7 +1,7 @@
 {
   "name": "overpass",
   "author": "Daniel Bally",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "keywords": [
     "pebble-app"
   ],
@@ -23,7 +23,10 @@
       "PASSES",
       "GENERATED",
       "STATUS",
-      "PINS"
+      "PINS",
+      "MAP_LAND",
+      "MAP_TRACKS",
+      "MAP_LOCATION"
     ],
     "resources": {
       "media": []
