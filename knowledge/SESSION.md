@@ -20,3 +20,7 @@ CI health template .env requirement corrected with four regression cases.
 Physical watch installation/GPS and phone export remain unverified.
 See procedural/publish_release.md for full evidence.
 - 2026-09-28 09:00 — Claude Code CLI: 0.3.0 past+future timeline (history.js, flags bits 2–5, PASS_MAX 64, AGO countdowns, NOW rule, weak forecasts); verifier APPROVE WITH NITS → 6 fixes; render_store H11/H12 PASS; render_map offline restore PASS; ruff/mypy/tests pass.
+
+## Checkpoint Log
+
+- 2026-09-28 09:04 — commit: feat: Overpass 0.3.0 — past + future timeline | README.md,directives/build_watchapp.md,execution/publish_release.py,execution/render_store.py,knowledge/SESSION.md
