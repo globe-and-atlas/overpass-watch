@@ -27,3 +27,5 @@
 - 2026-09-27 22:50 — pytest 14/14; emulator W8/W9 PASS (after retry-until-foreground boot); CloudPebble sim dropped none
 - 2026-09-27 22:22 — commit: feat: Overpass watch app — next Landsat/Sentinel-2 passes, cloud, confidence, ground-truth pins | .gitignore,README.md,directives/build_watchapp.md,execution/emulator_check.py,execution/make_reference.py
 - 2026-09-27 22:25 — commit: feat: Overpass watch app — next Landsat/Sentinel-2 passes, cloud, confidence, ground-truth pins | .gitignore,README.md,directives/build_watchapp.md,execution/emulator_check.py,execution/make_reference.py
+- 2026-09-27 22:25 — commit: docs: install links | README.md,knowledge/SESSION.md
+- 2026-09-27 23:10 — public repo globe-and-atlas/overpass-watch (main); privacy test patterns moved to gitignored tests/private_patterns.txt; creator-verifier not yet run (UNVERIFIED)
