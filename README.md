@@ -49,8 +49,10 @@ The phone predicts; the watch shows and pins.
 
 - `src/pkjs/passes.js` ports the pass model from [`../overpass`](../overpass). A 60-day hindcast at
   Houston, Denver, Nairobi, and Madrid found 100% recall and 100% precision among the model's
-  in-swath subset, with matched-scene timing 8–52 seconds from prediction. This small sample does not
-  establish performance at other locations or future dates. Orbits use vendored
+  core-swath subset, with matched-scene timing 8–52 seconds from prediction. These are results from
+  one 60-day, four-site sample, not a general accuracy guarantee. The internal `certain` tag means
+  only that a modeled ground-track distance is inside the nominal swath by the age buffer; it is not
+  a probability, and the imagery catalogue may omit acquisitions. Orbits use vendored
   [satellite.js](https://github.com/shashwatak/satellite-js) 4.1.4 (MIT) with CelesTrak TLEs, cached 6 h.
 - The JS output is tested against the Python reference on frozen TLEs (same passes, ±5 s, ±2 km, same
   confidence). A 16-day prediction takes ~160 ms in node.

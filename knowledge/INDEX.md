@@ -2,6 +2,7 @@
 
 | File | Type | Summary |
 |------|------|---------|
+| Updated | 2026-09-28 | session closeout |
 | [context.md](context.md) | domain | Project identity, stack, constraints |
 | [SESSION.md](SESSION.md) | log | Active work and checkpoints |
 | [DECISIONS.md](DECISIONS.md) | log | Architecture and scope decisions |

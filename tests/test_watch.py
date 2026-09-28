@@ -94,3 +94,16 @@ def test_w10_no_home_coordinates():
 def test_w11_cloudpebble_layout():
     assert all(p.suffix in (".c", ".h") for p in (SRC / "c").iterdir())
     assert all(p.suffix in (".js", ".json") for p in (SRC / "pkjs").iterdir())
+
+
+def test_032_public_copy_states_limits_and_location_use():
+    root = Path(__file__).resolve().parents[1]
+    readme = (root / "README.md").read_text().lower()
+    store = (root / "store/description.txt").read_text().lower()
+    assert "this is a heuristic, not a probability" in readme
+    assert "not proof that no acquisition occurred" in readme
+    assert "coordinates to open-meteo" in store
+    assert "and element 84 earth search" in store
+    assert "pin records stay in phone storage and are not included in those requests" in store
+    assert len((root / "store/description.txt").read_text()) <= 1600
+    assert "certain-precision 100 %" not in (root / "watchface/src/pkjs/passes.js").read_text().lower()

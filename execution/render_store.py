@@ -2,7 +2,7 @@
 
 Uses the public downtown-Houston fixture (never the owner's home), live TLEs, catalogue and cloud.
   store/emery_map.png   default view: map for the next future pass (H11)
-  store/emery_past.png  map for a past pass (seen scene / processing / not acquired)
+  store/emery_past.png  map for a past pass (seen scene / processing / catalogue no-match)
   store/emery_list.png  list view: past rows above the amber NOW rule, future below (H12)
 Restores dev.json to {} and leaves a production build.
 

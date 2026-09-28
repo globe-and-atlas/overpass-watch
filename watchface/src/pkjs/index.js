@@ -165,8 +165,8 @@ function refresh() {
 }
 
 // A ground-truth pin: precise location now, tagged with the timeline entry nearest in time (past or
-// future). nearest_pass_state says what that entry is: scene (a real acquisition), pending, missed
-// (predicted but not acquired) or future (a prediction).
+// future). nearest_pass_state says what that entry is: scene (a catalogue match), pending, no_match
+// (no catalogue result after the product-lag window) or future (a prediction).
 function pin() {
   status('PINNING...');
   locate(true, function (err, c) {

@@ -79,8 +79,10 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - RePebble public PBW bytes match the verified production PBW.
 
 ### Checklist
-- [ ] Correct user-visible labels and privacy copy.
-- [ ] Align directive and README with observed behavior.
-- [ ] Run tests, build, and render review.
-- [ ] Run an independent verifier.
-- [ ] Commit and update GitHub/RePebble editions.
+- [x] Correct user-visible labels and privacy copy in source, README, and local Store description.
+- [x] Align directive and README with observed behavior.
+- [x] Run tests, build, and render review.
+- [x] Run independent source/render verification.
+- [x] Commit corrected source and update GitHub release `v0.3.2`.
+- [x] Verify RePebble serves version `0.3.2` and preserve its exact PBW in the GitHub release.
+- [ ] Replace legacy RePebble listing description; current Dev Portal account has no managed apps.

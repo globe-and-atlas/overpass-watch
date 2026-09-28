@@ -1,19 +1,7 @@
-Overpass brings satellite-pass planning to Pebble Time 2, looking both ways in time. See upcoming Landsat 8/9 and Sentinel-2A/B/C passes over your location with a countdown, hourly cloud forecast and coverage flags, and scroll back through the last 30 days to see which passes produced a real scene and how cloudy it was.
+Plan Landsat 8/9 and Sentinel-2A/B/C passes over your location on Pebble Time 2. See a countdown, hourly cloud forecast, and modeled cross-track coverage. A 30-day history reports matching Earth Search scenes, whole-scene cloud cover, product-lag status, or a catalogue no-match. No-match does not prove that no acquisition occurred.
 
-The regional map shows your location, the selected satellite ground track and its nominal imaging swath. The pass list puts past acquisitions above an amber NOW line and predictions below it. Predictions and their map remain available offline.
+The regional map shows your center, selected ground track, and nominal imaging swath; predictions and maps are cached for offline use. The map is an overview, unavailable above 80° latitude, and not live navigation. Sentinel-2A has a partial acquisition plan. Coverage and swath-edge status are geometric heuristics, not probabilities or guarantees. Cloud forecasts over five days have little skill.
 
-Past passes: SEEN (a matching scene is listed; cloud is the whole scene's cover, not the cloud over you), PROCESSING (no matching scene yet, inside the expected product lag), or NO SCENE MATCH FOUND (no matching result in Earth Search after that window). A no-match is not proof that no acquisition occurred. Cloud forecasts more than five days out are marked with "~" because they have little skill.
+Refresh sends current coordinates to Open-Meteo for cloud forecasts and Element 84 Earth Search for scene history. Pin records stay in phone storage and are not included in those requests; open app settings to copy them as GeoJSON. Requires location permission for fresh local predictions and an internet connection for forecasts and scene history.
 
-UP/DOWN: select a pass (UP goes back in time)
-Hold DOWN: switch map/list
-SELECT: save a timestamped ground-truth pin on the phone
-Hold SELECT: refresh predictions
-Export pins as GeoJSON from the app settings.
-
-Coverage is predicted, not guaranteed acquisition. Sentinel-2A uses a partial acquisition plan. The map is a regional overview and is unavailable above 80 degrees latitude. Requires phone location permission and an internet connection for fresh predictions and scene history.
-
-Privacy: refresh sends your current coordinates to Open-Meteo for cloud forecasts and to Element 84 Earth Search for scene history. Pin records are stored on your phone and are not sent in those requests; they are shown as GeoJSON when you open the export page.
-
-Emulator-tested. Physical-watch GPS and phone export validation remain pending.
-
-Data: CelesTrak, Element 84 Earth Search (Landsat Collection 2 L2, Sentinel-2 L2A), Open-Meteo (CC BY 4.0), Natural Earth (public domain). Source: https://github.com/globe-and-atlas/overpass-watch
+Controls: UP/DOWN selects a pass; hold DOWN switches map/list; SELECT saves a timestamped pin; hold SELECT refreshes. Data: CelesTrak, Open-Meteo (CC BY 4.0), Element 84 Earth Search, Natural Earth (public domain). Source: https://github.com/globe-and-atlas/overpass-watch

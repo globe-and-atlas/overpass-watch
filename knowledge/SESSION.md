@@ -28,3 +28,7 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 14:28 — release: Overpass 0.3.1 — update store icons and live screenshots, publish to RePebble
 - 2026-09-28 14:30 — commit: chore: Overpass 0.3.1 — update store icons and live screenshots | knowledge/SESSION.md,store/emery_list.png,store/emery_map.png,store/emery_past.png,store/release-notes.txt
 - 2026-09-28 14:52 — release: Overpass 0.3.2 — publish 0.3.2 with privacy/accuracy updates and fresh screenshots to RePebble
+- 2026-09-28 14:58 — commit: feat: Overpass 0.3.2 — privacy and accuracy fixes, buffer safety, updated store assets | README.md,directives/build_watchapp.md,knowledge/ERRORS.md,knowledge/SESSION.md,store/description.txt
+- 2026-09-28 — OpenAI Codex (GPT-6): 0.3.2 accuracy/privacy contract; historical no-match correction, explicit coordinate disclosures, confidence caveat, test pass; refreshing release emulator captures.
+- 2026-09-28 — Store map/past/list renders pass H11/H12 pixel checks; pin screen captured and visually inspected. `dev.json` restored to `{}`.
+- 2026-09-28 15:45 — verified public RePebble PBW is version 0.3.2 with correct package UUID. Current local rebuild differs only in comments and generated manifest timestamps; attaching exact public PBW bytes to GitHub release. Public listing description edit remains blocked by Dev Portal account mismatch.
