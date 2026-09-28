@@ -1,15 +1,17 @@
-Overpass brings satellite-pass planning to Pebble Time 2. See upcoming Landsat 8/9 and Sentinel-2A/B/C passes near your location, with a countdown, hourly cloud forecast, and coverage flags.
+Overpass brings satellite-pass planning to Pebble Time 2, looking both ways in time. See upcoming Landsat 8/9 and Sentinel-2A/B/C passes over your location with a countdown, hourly cloud forecast and coverage flags, and scroll back through the last 30 days to see which passes produced a real scene and how cloudy it was.
 
-The regional map shows your prediction location, the selected satellite ground track, and its nominal imaging swath. Switch to the pass list to compare upcoming opportunities. Predictions and their map remain available offline.
+The regional map shows your location, the selected satellite ground track and its nominal imaging swath. The pass list puts past acquisitions above an amber NOW line and predictions below it. Predictions and their map remain available offline.
 
-UP/DOWN: select a pass
+Past passes: SEEN (a real scene exists; cloud is the whole scene's cover, not the cloud over you), PROCESSING (not in the catalogue yet: Landsat takes about two weeks, Sentinel-2 about two days) or NOT ACQUIRED. Cloud forecasts more than five days out are marked with "~" because they have little skill.
+
+UP/DOWN: select a pass (UP goes back in time)
 Hold DOWN: switch map/list
 SELECT: save a timestamped ground-truth pin on the phone
 Hold SELECT: refresh predictions
 Export pins as GeoJSON from the app settings.
 
-Coverage is predicted, not guaranteed acquisition. Sentinel-2A uses a partial acquisition plan. The map is a regional overview and is unavailable above 80 degrees latitude. Requires phone location permission and an internet connection for fresh predictions.
+Coverage is predicted, not guaranteed acquisition. Sentinel-2A uses a partial acquisition plan. The map is a regional overview and is unavailable above 80 degrees latitude. Requires phone location permission and an internet connection for fresh predictions and scene history.
 
-Initial public release; emulator-tested. Physical-watch GPS and phone export validation remain pending.
+Emulator-tested. Physical-watch GPS and phone export validation remain pending.
 
-Data: CelesTrak, Open-Meteo (CC BY 4.0), Natural Earth (public domain). Source: https://github.com/globe-and-atlas/overpass-watch
+Data: CelesTrak, Element 84 Earth Search (Landsat Collection 2 L2, Sentinel-2 L2A), Open-Meteo (CC BY 4.0), Natural Earth (public domain). Source: https://github.com/globe-and-atlas/overpass-watch

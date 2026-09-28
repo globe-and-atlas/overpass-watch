@@ -29,11 +29,11 @@ def main():
                '--release-notes', (store / 'release-notes.txt').read_text(),
                '--source', 'https://github.com/globe-and-atlas/overpass-watch',
                '--category', 'tools-utilities', '--icon-small', str(store / 'icon-small.png'),
-               '--icon-large', str(store / 'icon-large.png'), '--screenshots',
-               str(store / 'emery_map.png'), str(store / 'emery_landsat.png'), str(store / 'emery_list.png')]
+               '--icon-large', str(store / 'icon-large.png'), '--replace-screenshots', '--screenshots',
+               str(store / 'emery_map.png'), str(store / 'emery_past.png'), str(store / 'emery_list.png')]
     print(f'Production {package["version"]} package verified; fixture empty.', flush=True)
     if args.dry_run:
-        print('Dry run: would publish app with 3 screenshots and supplied icons.')
+        print('Dry run: would publish app, replacing the listing screenshots with 3 new ones.')
         return
     subprocess.run(command, cwd=ROOT / 'watchface', check=True)
 

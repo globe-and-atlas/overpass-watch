@@ -40,11 +40,35 @@ def test_w6_js_pack_parses_in_c(harness):
     assert run(harness, "parse", hexdata) == ["1790000000 1 0 431 69 L9", "1790500000 2 3 1017 -1 S2A"]
 
 
+@pytest.mark.skipif(shutil.which("node") is None, reason="needs node")
+def test_h10_timeline_flags_parse_in_c(harness):
+    """0.3 flags: SCENE with scene cloud, MISSED with partial plan, WEAK future, unknown distance."""
+    now = 1790000000000
+    script = (
+        "const h=require('./src/pkjs/history');const now=" + str(now) + ", D=86400000;"
+        "const tl=[{code:4,timeMs:now-4*D,distanceKm:101.9,confidence:'certain',partialPlan:false,state:'scene',cloud:3.2},"
+        "{code:2,timeMs:now-5*D,distanceKm:102.2,confidence:'edge',partialPlan:true,state:'missed',cloud:null},"
+        "{code:0,timeMs:now-6*D,distanceKm:null,confidence:'certain',partialPlan:false,state:'scene',cloud:12},"
+        "{code:1,timeMs:now+6*D,distanceKm:43.1,confidence:'certain',partialPlan:false,state:'future',cloud:null}];"
+        "console.log(Buffer.from(h.packTimeline(tl,{},now)).toString('hex'))")
+    hexdata = subprocess.run(["node", "-e", script], cwd=ROOT / "watchface", capture_output=True, text=True,
+                             check=True).stdout.strip()
+    s = now // 1000
+    assert run(harness, "parse", hexdata) == [
+        f"{s - 4 * 86400} 4 4 1019 3 S2C",          # SCENE, scene cloud 3 %
+        f"{s - 5 * 86400} 2 19 1022 -1 S2A",        # EDGE|PARTIAL|MISSED, no cloud
+        f"{s - 6 * 86400} 0 4 65535 12 L8",         # SCENE with no predicted pass
+        f"{s + 6 * 86400} 1 32 431 -1 L9",          # WEAK future, no forecast in fixture
+    ]
+
+
 @pytest.mark.parametrize("seconds,expected", [
-    (0, "NOW"), (120, "NOW"), (-120, "NOW"), (-121, "PASSED"), (121, "00:03"), (3600, "01:00"),
+    (0, "NOW"), (120, "NOW"), (-120, "NOW"), (121, "00:03"), (3600, "01:00"),
     (86399, "24:00"), (86400, "1d 00h"), (2 * 86400 + 4 * 3600 + 59, "2d 04h"),
+    # H9: past times
+    (-121, "2M AGO"), (-3599, "59M AGO"), (-3600, "1H AGO"), (-86399, "23H AGO"), (-4 * 86400 - 5, "4d AGO"),
 ])
-def test_w7_countdown(harness, seconds, expected):
+def test_w7_h9_countdown(harness, seconds, expected):
     assert run(harness, "countdown", str(seconds)) == [expected]
 
 

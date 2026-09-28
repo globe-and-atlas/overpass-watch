@@ -22,7 +22,10 @@ int passes_parse(const uint8_t *d, int len, Pass *out, int max) {
 
 void passes_countdown(int32_t s, char *buf, size_t n) {
   if (s < -PASS_NOW_S) {
-    snprintf(buf, n, "PASSED");
+    int32_t ago = -s;
+    if (ago < 3600) snprintf(buf, n, "%dM AGO", (int)(ago / 60));
+    else if (ago < 86400) snprintf(buf, n, "%dH AGO", (int)(ago / 3600));
+    else snprintf(buf, n, "%dd AGO", (int)(ago / 86400));
   } else if (s <= PASS_NOW_S) {
     snprintf(buf, n, "NOW");
   } else if (s < 86400) {

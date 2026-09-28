@@ -52,3 +52,32 @@ Execution: execution/build_map_data.py, execution/render_review.py; node map tes
 User explicitly requested commit, GitHub push and RePebble app store publication. This supersedes the earlier pending demand-test release gate. Publish truthful regional-map/nominal-swath description and note hardware validation remains open. Acceptance conditions are in task.md Publish 0.2.0. Fix known false pin-save acknowledgement before publication.
 
 Publication scripts: execution/publish_release.py (PBW guard and SDK publish), execution/release_store.py (read-only metadata), execution/create_store_assets.swift (native vector icon), execution/render_map.py (screenshots).
+
+## 2026-09-28 0.3.0 — past + future timeline (Claude Code CLI)
+
+One timeline centred on now: UP scrolls into the last 30 days of acquisitions, DOWN into the next
+16 days of predictions; default selection stays the next future pass. Past = passes predicted with
+the same model, each matched to real scenes from Earth Search STAC (`landsat-c2-l2`,
+`sentinel-2-l2a`, same catalogue the model was validated against). Scenes with no predicted pass
+are listed too. Distant cloud forecasts are marked low-skill.
+
+Record flags (byte 5): bit0 edge, bit1 partial plan, **bit2 SCENE** (real scene exists; cloud =
+scene `eo:cloud_cover`, whole scene), **bit3 PENDING** (no scene yet, still inside the product lag:
+Landsat L2 16 d, Sentinel-2 L2A 2 d), **bit4 MISSED** (no scene, lag elapsed), **bit5 WEAK** (future
+pass > 5 days out: forecast has little skill). PASS_MAX 40 → 64.
+
+| # | Assertion | Check |
+|---|---|---|
+| H1 | A past predicted pass with a same-platform same-UTC-date scene is SCENE with that scene's cloud | node |
+| H2 | Several scenes (tiles) on one platform-date collapse to one entry with the lowest cloud | node |
+| H3 | A past pass with no scene inside the platform lag is PENDING, never MISSED | node |
+| H4 | A past pass with no scene after the lag is MISSED | node |
+| H5 | A scene with no predicted pass still appears as a SCENE entry | node |
+| H6 | Future passes more than 5 days out carry WEAK; nearer ones don't | node |
+| H7 | Past entries never carry a forecast cloud value | node |
+| H8 | With more than 64 entries, the oldest past entries are dropped, never future ones | node |
+| H9 | Countdown for past times reads "NM AGO" / "NH AGO" / "Nd AGO" | host C |
+| H10 | Flags bits 2–5 round-trip JS pack → C parse | host C + node |
+| H11 | Default selection is the next future pass, not a past one | code review + emulator |
+| H12 | Emulator: list shows past entries above a NOW divider and future below | emulator screenshot |
+| H13 | Catalogue failure keeps the future half working (past half empty, status says so) | node |

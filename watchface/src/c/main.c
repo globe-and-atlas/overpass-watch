@@ -120,42 +120,103 @@ static void text(GContext *ctx, const char *s, GFont f, GRect r, GColor c, GText
   graphics_draw_text(ctx, s, f, r, GTextOverflowModeTrailingEllipsis, a, NULL);
 }
 
+// Scene cloud is whole-scene, not the cloud over you: only call it low when it's low everywhere.
+#define LOW_CLOUD_PCT 10
+#define LANDSAT_LAG_S (16 * 86400)
+#define SENTINEL_LAG_S (2 * 86400)
+
+// A pass predicted as future whose time has gone by while offline: its forecast is meaningless
+// and nobody has checked the catalogue for it yet.
+static bool unchecked(const Pass *p, uint32_t now) {
+  return !(p->flags & PASS_PAST) && (int64_t)p->time + PASS_NOW_S < (int64_t)now;
+}
+
+static bool is_past(const Pass *p, uint32_t now) {
+  return (p->flags & PASS_PAST) || unchecked(p, now);
+}
+
+// Cloud text: the scene's cloud for past passes, "~NN%" for low-skill forecasts, "--" unknown.
+static void cloud_text(const Pass *p, char *buf, size_t n) {
+  if (p->cloud < 0) snprintf(buf, n, "--");
+  else snprintf(buf, n, (p->flags & PASS_WEAK) ? "~%d%%" : "%d%%", p->cloud);
+}
+
+// What the selected pass means, for the hero and the map view alike.
+static const char *pass_state(const Pass *p, uint32_t now, GColor *color) {
+  if (unchecked(p, now)) {
+    *color = GColorLightGray;
+    return "PASSED - NOT CHECKED";
+  }
+  if (p->flags & PASS_SCENE) {
+    bool low = p->cloud >= 0 && p->cloud <= LOW_CLOUD_PCT;
+    *color = low ? GColorCyan : GColorWhite;
+    return low ? "SEEN - LOW CLOUD SCENE" : "SEEN - CLOUDY SCENE";
+  }
+  if (p->flags & PASS_PENDING) {
+    uint32_t lag = p->platform <= 1 ? LANDSAT_LAG_S : SENTINEL_LAG_S;
+    if ((int64_t)now - p->time > lag) {
+      *color = GColorLightGray;
+      return "NO SCENE YET - REFRESH";
+    }
+    *color = GColorLiberty;
+    return p->platform <= 1 ? "PROCESSING (LANDSAT ~2 WK)" : "PROCESSING";
+  }
+  if (p->flags & PASS_MISSED) {
+    *color = GColorOrange;
+    return (p->flags & PASS_PARTIAL) ? "NOT ACQUIRED (S2A PLAN)"
+         : (p->flags & PASS_EDGE)    ? "NOT ACQUIRED (EDGE)"
+                                     : "NOT ACQUIRED";
+  }
+  if ((p->flags & PASS_EDGE) && (p->flags & PASS_PARTIAL)) {
+    *color = GColorOrange;
+    return "EDGE - MAY NOT ACQUIRE";
+  }
+  if (p->flags & PASS_PARTIAL) {
+    *color = GColorOrange;
+    return "MAY NOT ACQUIRE (S2A PLAN)";
+  }
+  if (p->flags & PASS_EDGE) {
+    *color = GColorLiberty;
+    return "EDGE - MAY MISS YOU";
+  }
+  *color = GColorCyan;
+  return "IN SWATH";
+}
+
 static void draw_hero(GContext *ctx, const Pass *p, uint32_t now) {
-  char buf[48];
+  char buf[48], cloud[12];
+  bool past = is_past(p, now);
   text(ctx, passes_platform_name(p->platform), s_f24, GRect(4, 16, 192, 28), GColorWhite, GTextAlignmentLeft);
 
   passes_countdown((int32_t)(p->time - now), buf, sizeof(buf));
-  text(ctx, buf, s_f28, GRect(4, 42, 192, 32), GColorCyan, GTextAlignmentLeft);
+  text(ctx, buf, s_f28, GRect(4, 42, 192, 32), past ? GColorLightGray : GColorCyan, GTextAlignmentLeft);
 
   time_t t = p->time;
   strftime(buf, sizeof(buf), clock_is_24h_style() ? "%a %d %b  %H:%M" : "%a %d %b  %I:%M %p", localtime(&t));
   text(ctx, buf, s_f18, GRect(4, 76, 192, 22), GColorWhite, GTextAlignmentLeft);
 
-  char cloud[12];
-  if (p->cloud >= 0) snprintf(cloud, sizeof(cloud), "%d%%", p->cloud);
-  else snprintf(cloud, sizeof(cloud), "--");
-  snprintf(buf, sizeof(buf), "%d KM OFF TRACK  CLOUD %s", p->dist10 / 10, cloud);
+  cloud_text(p, cloud, sizeof(cloud));
+  if (p->flags & PASS_SCENE) {
+    snprintf(buf, sizeof(buf), "SCENE CLOUD %s", cloud);
+  } else if (past) {
+    snprintf(buf, sizeof(buf), "%d KM OFF TRACK", p->dist10 / 10);
+  } else {
+    snprintf(buf, sizeof(buf), "%d KM OFF TRACK  CLOUD %s", p->dist10 / 10, cloud);
+  }
   text(ctx, buf, s_f14, GRect(4, 98, 192, 16), AMBER, GTextAlignmentLeft);
 
-  const char *flag = "IN SWATH";
-  GColor color = GColorCyan;
-  if ((p->flags & PASS_EDGE) && (p->flags & PASS_PARTIAL)) {
-    flag = "EDGE - MAY NOT ACQUIRE";
-    color = GColorOrange;
-  } else if (p->flags & PASS_PARTIAL) {
-    flag = "MAY NOT ACQUIRE (S2A PLAN)";
-    color = GColorOrange;
-  } else if (p->flags & PASS_EDGE) {
-    flag = "EDGE - MAY MISS YOU";
-    color = GColorLiberty;
-  }
-  text(ctx, flag, s_f14, GRect(4, 113, 192, 16), color, GTextAlignmentLeft);
+  GColor color;
+  const char *state = pass_state(p, now, &color);
+  text(ctx, state, s_f14, GRect(4, 113, 192, 16), color, GTextAlignmentLeft);
 }
 
-static void draw_list(GContext *ctx) {
+// Rows: past entries show the scene's cloud, WAIT (processing) or MISS; future ones the forecast.
+// An amber rule marks NOW between the last past row and the first future one.
+static void draw_list(GContext *ctx, uint32_t now) {
   int first = s_sel - 1;
   if (first > s_count - LIST_ROWS) first = s_count - LIST_ROWS;
   if (first < 0) first = 0;
+  int next = passes_next(s_passes, s_count, now);
   for (int row = 0; row < LIST_ROWS && first + row < s_count; row++) {
     int i = first + row;
     const Pass *p = &s_passes[i];
@@ -164,15 +225,33 @@ static void draw_list(GContext *ctx) {
       graphics_context_set_fill_color(ctx, GColorDarkGray);
       graphics_fill_rect(ctx, r, 2, GCornersAll);
     }
-    char when[20], line[40], cloud[8];
+    if (i == next && row > 0) {
+      graphics_context_set_stroke_color(ctx, AMBER);
+      graphics_draw_line(ctx, GPoint(4, r.origin.y), GPoint(196, r.origin.y));
+    }
+    char when[20], line[40], tag[8];
     time_t t = p->time;
     strftime(when, sizeof(when), clock_is_24h_style() ? "%d %b %H:%M" : "%d %b %I:%M%p", localtime(&t));
-    if (p->cloud >= 0) snprintf(cloud, sizeof(cloud), "%d%%", p->cloud);
-    else snprintf(cloud, sizeof(cloud), "--");
-    snprintf(line, sizeof(line), "%-3s %s %s%s", passes_platform_short(p->platform), when, cloud,
-             (p->flags & (PASS_EDGE | PASS_PARTIAL)) ? " ?" : "");
-    text(ctx, line, s_f14, GRect(r.origin.x + 4, r.origin.y - 1, r.size.w - 8, 16),
-         (p->flags & (PASS_EDGE | PASS_PARTIAL)) ? GColorLightGray : GColorWhite, GTextAlignmentLeft);
+    GColor color = GColorWhite;
+    if (unchecked(p, now)) {
+      snprintf(tag, sizeof(tag), "PAST");
+      color = GColorLightGray;
+    } else if (p->flags & PASS_SCENE) {
+      cloud_text(p, tag, sizeof(tag));
+      color = (p->cloud >= 0 && p->cloud <= LOW_CLOUD_PCT) ? GColorCyan : GColorLightGray;
+    } else if (p->flags & PASS_PENDING) {
+      snprintf(tag, sizeof(tag), "WAIT");
+      color = GColorLiberty;
+    } else if (p->flags & PASS_MISSED) {
+      snprintf(tag, sizeof(tag), "MISS");
+      color = GColorOrange;
+    } else {
+      cloud_text(p, tag, sizeof(tag));
+      if (p->flags & (PASS_EDGE | PASS_PARTIAL)) color = GColorLightGray;
+    }
+    snprintf(line, sizeof(line), "%-3s %s %s%s", passes_platform_short(p->platform), when, tag,
+             !is_past(p, now) && (p->flags & (PASS_EDGE | PASS_PARTIAL)) ? " ?" : "");
+    text(ctx, line, s_f14, GRect(r.origin.x + 4, r.origin.y - 1, r.size.w - 8, 16), color, GTextAlignmentLeft);
   }
 }
 
@@ -190,22 +269,28 @@ static void canvas_update(Layer *layer, GContext *ctx) {
   if (s_count > 0) {
     if (s_map_view) {
       const Pass *p = &s_passes[s_sel];
+      bool past = is_past(p, now);
       char buf[48], when[24], cloud[8];
       text(ctx, passes_platform_name(p->platform), s_f24, GRect(4, 16, 192, 28), GColorWhite, GTextAlignmentLeft);
       passes_countdown((int32_t)(p->time - now), buf, sizeof(buf));
-      text(ctx, buf, s_f24, GRect(4, 40, 95, 27), GColorCyan, GTextAlignmentLeft);
+      text(ctx, buf, s_f24, GRect(4, 40, 95, 27), past ? GColorLightGray : GColorCyan, GTextAlignmentLeft);
       time_t pt = p->time;
       strftime(when, sizeof(when), "%d %b %H:%M", localtime(&pt));
       text(ctx, when, s_f14, GRect(94, 49, 102, 16), GColorWhite, GTextAlignmentRight);
-      if (p->cloud >= 0) snprintf(cloud, sizeof(cloud), "%d%%", p->cloud);
-      else snprintf(cloud, sizeof(cloud), "--");
-      snprintf(buf, sizeof(buf), "CLOUD %s  %s", cloud, p->flags & PASS_PARTIAL ? "PLAN LIMITED" : p->flags & PASS_EDGE ? "EDGE" : "IN SWATH");
-      text(ctx, buf, s_f14, GRect(4, 189, 192, 16), p->flags ? AMBER : GColorCyan, GTextAlignmentLeft);
+      GColor color;
+      const char *state = pass_state(p, now, &color);
+      if ((p->flags & PASS_SCENE) || !past) {
+        cloud_text(p, cloud, sizeof(cloud));
+        snprintf(buf, sizeof(buf), "%s  %s", cloud, state);
+      } else {
+        snprintf(buf, sizeof(buf), "%s", state);
+      }
+      text(ctx, buf, s_f14, GRect(4, 189, 192, 16), color, GTextAlignmentLeft);
     } else {
       draw_hero(ctx, &s_passes[s_sel], now);
-    graphics_context_set_stroke_color(ctx, GColorDarkGray);
-    graphics_draw_line(ctx, GPoint(4, 132), GPoint(196, 132));
-    draw_list(ctx);
+      graphics_context_set_stroke_color(ctx, GColorDarkGray);
+      graphics_draw_line(ctx, GPoint(4, 132), GPoint(196, 132));
+      draw_list(ctx, now);
     }
   } else {
     text(ctx, "NO PASSES YET", s_f24, GRect(4, 70, 192, 28), GColorWhite, GTextAlignmentCenter);
@@ -272,7 +357,8 @@ static void on_tick(struct tm *t, TimeUnits changed) {
 // ---- lifecycle ----------------------------------------------------------------------------
 
 static void map_update(Layer *layer, GContext *ctx) {
-  if (s_count) map_draw(ctx, s_sel, s_passes[s_sel].flags);
+  // The swath outline is amber only for geometric doubt (edge / partial plan), not for past states.
+  if (s_count) map_draw(ctx, s_sel, s_passes[s_sel].flags & (PASS_EDGE | PASS_PARTIAL));
 }
 
 static void window_load(Window *w) {

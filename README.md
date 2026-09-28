@@ -24,9 +24,22 @@ FeatureCollection to copy (with a clear-all button). Pins never leave the phone 
 ## Install
 
 - [Install from the RePebble App Store](https://apps.repebble.com/6e920a2fa6304e45b4644116)
-- [Download the 0.2.0 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.2.0)
+- [Download the 0.3.0 PBW](https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.3.0)
 - [Open in CloudPebble](https://cloudpebble.repebble.com/ide/import/github/globe-and-atlas/overpass-watch/main) (the branch is in the link because CloudPebble's import defaults to `master`)
 - Or build locally: `cd watchface && pebble build && pebble install --cloudpebble build/watchface.pbw`
+
+## Past and future (0.3.0)
+
+UP scrolls back through the last 30 days, DOWN forward through the next 16; the default selection is
+the next pass. Past passes come from the same prediction model, matched (same satellite, within
+±30 minutes) to real scenes in Element 84 Earth Search (Landsat Collection 2 L2, Sentinel-2 L2A):
+
+- **SEEN**: a scene exists. Cloud is the scene's `eo:cloud_cover` for the whole scene, not the
+  cloud over you; "low cloud" means ≤ 10 %.
+- **PROCESSING**: no scene yet, still inside the product lag (Landsat 16 days, Sentinel-2 2 days).
+- **NOT ACQUIRED**: no scene after the lag (often Sentinel-2A's partial plan).
+- Scenes that match no predicted pass are listed too. Future cloud forecasts beyond 5 days show `~`.
+- Offline, a pass whose time has gone by reads **PASSED - NOT CHECKED** until the next refresh.
 
 ## How it works
 

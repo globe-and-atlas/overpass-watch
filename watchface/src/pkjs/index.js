@@ -3,14 +3,16 @@
 // settings page. Pins and home never leave the phone.
 
 var passes = require('./passes');
+var history = require('./history');
 var map = require('./map');
 var dev = require('./dev.json');  // emulator fixture: {"lat": .., "lon": ..}; ships as {}
 
 var CELESTRAK = 'https://celestrak.org/NORAD/elements/gp.php?FORMAT=TLE&CATNR=';
 var OPEN_METEO = 'https://api.open-meteo.com/v1/forecast?hourly=cloud_cover&forecast_days=16&timezone=UTC';
+var EARTH_SEARCH = 'https://earth-search.aws.element84.com/v1/search';
 var TLE_MAX_AGE_MS = 6 * 3600 * 1000;
 var HORIZON_MS = 16 * 86400 * 1000;
-var MAX_PASSES = 40;
+var MAX_PASSES = 64;  // matches PASS_MAX in src/c/passes.h
 var CMD = { REFRESH: 1, PIN: 2 };
 
 // ---- storage ----------------------------------------------------------------------------------
@@ -72,6 +74,35 @@ function getTles(cb) {
   })();
 }
 
+function post(url, body, cb) {
+  var req = new XMLHttpRequest();
+  req.open('POST', url, true);
+  req.setRequestHeader('Content-Type', 'application/json');
+  req.timeout = 20000;
+  req.onload = function () {
+    if (req.status >= 200 && req.status < 300) cb(null, req.responseText);
+    else cb('HTTP ' + req.status);
+  };
+  req.onerror = function () { cb('network error'); };
+  req.ontimeout = function () { cb('timeout'); };
+  req.send(JSON.stringify(body));
+}
+
+// Real scenes over the location in the last 30 days (Landsat L2 + Sentinel-2 L2A), grouped per
+// platform-date. cb(null) when any catalogue request fails: the past half is then left out.
+function getScenes(lat, lon, now, cb) {
+  var features = [], left = history.COLLECTIONS.length, failed = false;
+  history.COLLECTIONS.forEach(function (collection) {
+    post(EARTH_SEARCH, history.searchBody(collection, lat, lon, now), function (err, text) {
+      if (err) failed = true;
+      else {
+        try { features = features.concat(JSON.parse(text).features || []); } catch (e) { failed = true; }
+      }
+      if (--left === 0) cb(failed ? null : history.groupScenes(features));
+    });
+  });
+}
+
 function getClouds(lat, lon, cb) {
   get(OPEN_METEO + '&latitude=' + lat + '&longitude=' + lon, function (err, text) {
     if (err) return cb({});
@@ -108,25 +139,33 @@ function refresh() {
     getTles(function (err2, tles) {
       if (err2) return status('NO TLE: OFFLINE?');
       var now = Date.now();
-      var list = passes.predict(tles, c.latitude, c.longitude, now - 5 * 60000, now + HORIZON_MS);
-      save('lastPasses', list.map(function (p) { return { platform: p.platform, timeMs: p.timeMs }; }));
-      getClouds(c.latitude, c.longitude, function (clouds) {
-        send({
-          PASSES: passes.packPasses(list, clouds, MAX_PASSES),
-          GENERATED: Math.round(now / 1000),
-          PINS: pins().length,
-          MAP_LAND: map.packLand(c.latitude, c.longitude),
-          MAP_TRACKS: map.packTracks(tles, list, c.latitude, c.longitude, MAX_PASSES),
-          MAP_LOCATION: Math.abs(c.latitude).toFixed(2) + (c.latitude < 0 ? 'S ' : 'N ') +
-            Math.abs(c.longitude).toFixed(2) + (c.longitude < 0 ? 'W' : 'E'),
-          STATUS: list.length ? '' : 'NO PASS 16 D'
+      var predicted = passes.predict(tles, c.latitude, c.longitude,
+                                     now - history.PAST_DAYS * 86400000, now + HORIZON_MS);
+      status('SCENES...');
+      getScenes(c.latitude, c.longitude, now, function (scenes) {
+        var list = history.capTimeline(history.buildTimeline(predicted, scenes, now), MAX_PASSES, now);
+        save('lastPasses', list.map(function (p) { return { platform: p.platform, timeMs: p.timeMs, state: p.state }; }));
+        var future = list.filter(function (e) { return e.state === 'future'; }).length;
+        getClouds(c.latitude, c.longitude, function (clouds) {
+          send({
+            PASSES: history.packTimeline(list, clouds, now),
+            GENERATED: Math.round(now / 1000),
+            PINS: pins().length,
+            MAP_LAND: map.packLand(c.latitude, c.longitude),
+            MAP_TRACKS: map.packTracks(tles, list, c.latitude, c.longitude, MAX_PASSES),
+            MAP_LOCATION: Math.abs(c.latitude).toFixed(2) + (c.latitude < 0 ? 'S ' : 'N ') +
+              Math.abs(c.longitude).toFixed(2) + (c.longitude < 0 ? 'W' : 'E'),
+            STATUS: !scenes ? 'NO CATALOGUE: FUTURE ONLY' : future ? '' : 'NO PASS 16 D'
+          });
         });
       });
     });
   });
 }
 
-// A ground-truth pin: precise location now, tagged with the nearest predicted pass.
+// A ground-truth pin: precise location now, tagged with the timeline entry nearest in time (past or
+// future). nearest_pass_state says what that entry is: scene (a real acquisition), pending, missed
+// (predicted but not acquired) or future (a prediction).
 function pin() {
   status('PINNING...');
   locate(true, function (err, c) {
@@ -144,6 +183,7 @@ function pin() {
         accuracy_m: Math.round(c.accuracy || 0),
         nearest_pass: nearest ? nearest.platform : null,
         nearest_pass_utc: nearest ? new Date(nearest.timeMs).toISOString() : null,
+        nearest_pass_state: nearest ? (nearest.state || 'future') : null,
         minutes_from_pass: nearest ? Math.round((now - nearest.timeMs) / 60000) : null
       }
     });

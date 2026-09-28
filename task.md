@@ -45,3 +45,12 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] GitHub main contains committed source changes.
 - [x] RePebble store contains the release.
 - [x] Public app listing is verified.
+
+## Publish 0.3.0 — past + future timeline
+- [x] H1–H8, H10, H13 node tests pass (37 total).
+- [x] H9, H10 host C tests pass (pytest 23).
+- [x] H11, H12 emulator checks pass (execution/render_store.py).
+- [x] Offline restart restores the cached map with 0.3 data (execution/render_map.py).
+- [x] Fresh verifier: APPROVE WITH NITS; fixed low-cloud wording, offline passed/stale-pending states, ±30 min scene matching, version, pin state, scene flag doubt.
+- [x] Ruff, mypy, health: no failures.
+- [ ] Physical watch: past list with live catalogue over real GPS.
