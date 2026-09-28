@@ -24,3 +24,5 @@ See procedural/publish_release.md for full evidence.
 ## Checkpoint Log
 
 - 2026-09-28 09:04 — commit: feat: Overpass 0.3.0 — past + future timeline | README.md,directives/build_watchapp.md,execution/publish_release.py,execution/render_store.py,knowledge/SESSION.md
+- 2026-09-28 09:07 — commit: docs: record 0.3.0 publication | knowledge/SESSION.md,knowledge/procedural/publish_release.md
+- 2026-09-28 14:28 — release: Overpass 0.3.1 — update store icons and live screenshots, publish to RePebble

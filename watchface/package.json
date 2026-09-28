@@ -1,7 +1,7 @@
 {
   "name": "overpass",
   "author": "Daniel Bally",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "keywords": [
     "pebble-app"
   ],
