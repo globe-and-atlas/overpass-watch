@@ -86,4 +86,4 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] Commit corrected source and update GitHub release `v0.3.2`.
 - [x] Verify RePebble serves version `0.3.2` and preserve its exact PBW in the GitHub release.
 - [x] Save corrected privacy/history/confidence copy in the linked developer dashboard.
-- [ ] Confirm the public RePebble page serves the corrected Overpass description; current page still serves legacy copy after save.
+- [x] Confirm the public RePebble page serves the corrected description and 0.3.2 package.
