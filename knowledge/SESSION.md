@@ -9,7 +9,7 @@ Agent: OpenAI Codex (GPT-6)
 Handoff-from: OpenAI Codex
 Handoff-type: continuation
 Goal: Correct Overpass privacy and historical-status claims; update GitHub and RePebble editions.
-Status: In progress — correcting ambiguous catalogue label and historical release notes across both public listings.
+Status: Partial — Overpass 0.3.3 is published to GitHub and RePebble with matching PBW and corrected list render. Current descriptions are live. Public changelog routes still show stale historical release-note text after dashboard edits.
 
 GitHub release: https://github.com/globe-and-atlas/overpass-watch/releases/tag/v0.2.0
 Store: https://apps.repebble.com/6e920a2fa6304e45b4644116
@@ -41,3 +41,5 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 16:07 — commit: docs: confirm public listing descriptions | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
 
 - 2026-09-28 16:20 — Corrected public Constellation 0.1.0/0.1.1 and Overpass 0.3.0 historical release notes in the authenticated Daniel Bally publisher dashboard. Independent review identified Overpass list abbreviation `NO SCENE` as ambiguous; beginning 0.3.3 label correction.
+- 2026-09-28 16:15 — commit: fix: clarify no-match history label in Overpass | README.md,directives/build_watchapp.md,knowledge/ERRORS.md,knowledge/SESSION.md,store/emery_list.png
+- 2026-09-28 — Overpass 0.3.3 source commit `09fa920` pushed to GitHub; production 0.3.3 published to RePebble; public PBW SHA-256 `0f4a0f50b94772f59528cd37bf13a8b173c2e0083d49057d49b6172e377e04e9` matches local and GitHub release asset. Public listing shows 0.3.3 and corrected description; emulator list render inspected with `NO MATCH`. Public changelog still shows stale 0.3.0 note despite dashboard edit.

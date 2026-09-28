@@ -96,9 +96,10 @@ Overpass watch app: next Landsat/Sentinel-2 passes with cloud and confidence, on
 - [x] The same state retains explanatory hero text that says no matching scene was found.
 - [x] The production build succeeds with an empty `dev.json` fixture.
 - [x] The refreshed Store list render visibly uses `NO MATCH`.
-- [ ] The GitHub release and RePebble listing serve version 0.3.3.
+- [x] The GitHub release and RePebble listing serve version 0.3.3.
+- [ ] The public RePebble changelog reflects the corrected historical 0.3.0 note.
 
 ### Checklist
 - [x] Update the abbreviated watch list label and release notes.
 - [x] Rebuild and inspect the list render.
-- [ ] Publish the verified 0.3.3 package to GitHub and RePebble.
+- [x] Publish the verified 0.3.3 package to GitHub and RePebble.

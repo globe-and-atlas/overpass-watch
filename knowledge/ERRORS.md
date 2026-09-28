@@ -66,3 +66,7 @@ Cause: save() swallowed localStorage failures; pin/clear still acknowledged succ
 - 2026-09-28: Dashboard edits initially did not appear in the public listing; after propagation, browser verification confirmed the corrected Overpass text on the public app page.
 
 - 2026-09-28: A bundled-file lookup targeted the nonexistent `watchface/appinfo.json`; the package version lives in `watchface/package.json`, and generated app metadata lives under `watchface/build/`.
+
+- 2026-09-28: Publisher dashboard saved corrected Overpass 0.3.0 release notes and dashboard reflects them after reload, but the public RePebble changelog still shows the previous text after reload and a cache-busted URL. Public historical-note propagation remains unverified.
+
+- 2026-09-28: After a workspace-root `git status` failed, the error log append used a project-relative path while running from the Overpass checkout; the append failed. Retrying against `knowledge/ERRORS.md` in the checkout.
