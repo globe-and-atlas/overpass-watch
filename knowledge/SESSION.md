@@ -36,3 +36,4 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 15:46 — independent published-state verification confirmed commit/release 0.3.2 and exact public RePebble PBW bytes on GitHub; live description still omits privacy/history/confidence corrections, pending linked publisher account.
 - 2026-09-28 15:46 — commit: docs: record session capture timeout | knowledge/ERRORS.md
 - 2026-09-28 16:05 — authenticated dashboard is Daniel Bally and lists both existing apps. Corrected Overpass description persists on editor reload, but cache-busted public app page still serves older short copy; save-to-store propagation unverified.
+- 2026-09-28 16:03 — commit: docs: track listing propagation gap | knowledge/ERRORS.md,knowledge/SESSION.md,task.md
