@@ -1,0 +1,328 @@
+{
+  "start_utc": "2026-09-27T00:00:00Z",
+  "days": 16,
+  "locations": {
+    "houston": {
+      "lat": 29.76,
+      "lon": -95.37,
+      "passes": [
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-09-27T17:15:30Z",
+          "distance_km": 102.0,
+          "sun_elevation_deg": 56.0,
+          "tle_age_days": 0.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-09-29T17:05:32Z",
+          "distance_km": 134.9,
+          "sun_elevation_deg": 54.4,
+          "tle_age_days": 2.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-09-29T17:15:42Z",
+          "distance_km": 102.2,
+          "sun_elevation_deg": 55.4,
+          "tle_age_days": 2.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-9",
+          "time_utc": "2026-09-30T16:50:54Z",
+          "distance_km": 43.1,
+          "sun_elevation_deg": 52.4,
+          "tle_age_days": 3.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-02T17:15:28Z",
+          "distance_km": 101.7,
+          "sun_elevation_deg": 54.4,
+          "tle_age_days": 5.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-04T17:05:34Z",
+          "distance_km": 134.7,
+          "sun_elevation_deg": 52.8,
+          "tle_age_days": 7.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-06T17:05:45Z",
+          "distance_km": 134.6,
+          "sun_elevation_deg": 52.1,
+          "tle_age_days": 9.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-07T17:15:30Z",
+          "distance_km": 101.9,
+          "sun_elevation_deg": 52.7,
+          "tle_age_days": 10.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-8",
+          "time_utc": "2026-10-08T16:50:51Z",
+          "distance_km": 43.8,
+          "sun_elevation_deg": 50.0,
+          "tle_age_days": 11.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-09T17:05:31Z",
+          "distance_km": 135.4,
+          "sun_elevation_deg": 51.1,
+          "tle_age_days": 12.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-09T17:15:41Z",
+          "distance_km": 102.0,
+          "sun_elevation_deg": 52.0,
+          "tle_age_days": 12.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-12T17:15:27Z",
+          "distance_km": 101.0,
+          "sun_elevation_deg": 51.0,
+          "tle_age_days": 15.4,
+          "confidence": "certain"
+        }
+      ]
+    },
+    "denver": {
+      "lat": 39.74,
+      "lon": -104.99,
+      "passes": [
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-09-27T18:03:00Z",
+          "distance_km": 91.3,
+          "sun_elevation_deg": 47.4,
+          "tle_age_days": 0.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-9",
+          "time_utc": "2026-09-29T17:43:40Z",
+          "distance_km": 81.8,
+          "sun_elevation_deg": 45.4,
+          "tle_age_days": 2.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-09-29T17:53:05Z",
+          "distance_km": 117.5,
+          "sun_elevation_deg": 46.1,
+          "tle_age_days": 2.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-8",
+          "time_utc": "2026-09-30T17:37:30Z",
+          "distance_km": 46.8,
+          "sun_elevation_deg": 44.6,
+          "tle_age_days": 3.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-01T17:53:17Z",
+          "distance_km": 117.2,
+          "sun_elevation_deg": 45.4,
+          "tle_age_days": 4.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-02T18:03:01Z",
+          "distance_km": 91.5,
+          "sun_elevation_deg": 45.6,
+          "tle_age_days": 5.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-04T17:53:03Z",
+          "distance_km": 117.8,
+          "sun_elevation_deg": 44.3,
+          "tle_age_days": 7.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-04T18:03:13Z",
+          "distance_km": 91.7,
+          "sun_elevation_deg": 44.9,
+          "tle_age_days": 7.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-8",
+          "time_utc": "2026-10-07T17:43:37Z",
+          "distance_km": 81.4,
+          "sun_elevation_deg": 42.6,
+          "tle_age_days": 10.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-07T18:02:59Z",
+          "distance_km": 90.9,
+          "sun_elevation_deg": 43.8,
+          "tle_age_days": 10.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-9",
+          "time_utc": "2026-10-08T17:37:36Z",
+          "distance_km": 46.5,
+          "sun_elevation_deg": 41.8,
+          "tle_age_days": 11.6,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-09T17:53:05Z",
+          "distance_km": 117.6,
+          "sun_elevation_deg": 42.6,
+          "tle_age_days": 12.5,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-11T17:53:15Z",
+          "distance_km": 117.5,
+          "sun_elevation_deg": 41.9,
+          "tle_age_days": 14.4,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-12T18:03:01Z",
+          "distance_km": 91.1,
+          "sun_elevation_deg": 42.0,
+          "tle_age_days": 15.6,
+          "confidence": "certain"
+        }
+      ]
+    },
+    "madrid": {
+      "lat": 40.42,
+      "lon": -3.7,
+      "passes": [
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-09-27T11:19:59Z",
+          "distance_km": 120.3,
+          "sun_elevation_deg": 47.0,
+          "tle_age_days": 0.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-09-29T11:10:04Z",
+          "distance_km": 86.1,
+          "sun_elevation_deg": 45.7,
+          "tle_age_days": 2.3,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-9",
+          "time_utc": "2026-10-01T10:55:38Z",
+          "distance_km": 7.6,
+          "sun_elevation_deg": 44.0,
+          "tle_age_days": 4.3,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-01T11:10:16Z",
+          "distance_km": 85.8,
+          "sun_elevation_deg": 45.0,
+          "tle_age_days": 4.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-02T11:20:01Z",
+          "distance_km": 120.5,
+          "sun_elevation_deg": 45.2,
+          "tle_age_days": 5.3,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-04T11:10:02Z",
+          "distance_km": 86.4,
+          "sun_elevation_deg": 43.9,
+          "tle_age_days": 7.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-04T11:20:12Z",
+          "distance_km": 120.8,
+          "sun_elevation_deg": 44.5,
+          "tle_age_days": 7.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2b",
+          "time_utc": "2026-10-07T11:19:58Z",
+          "distance_km": 120.0,
+          "sun_elevation_deg": 43.4,
+          "tle_age_days": 10.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "landsat-8",
+          "time_utc": "2026-10-09T10:55:35Z",
+          "distance_km": 6.9,
+          "sun_elevation_deg": 41.2,
+          "tle_age_days": 12.3,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-09T11:10:04Z",
+          "distance_km": 86.2,
+          "sun_elevation_deg": 42.1,
+          "tle_age_days": 12.3,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2a",
+          "time_utc": "2026-10-11T11:10:15Z",
+          "distance_km": 86.0,
+          "sun_elevation_deg": 41.4,
+          "tle_age_days": 14.2,
+          "confidence": "certain"
+        },
+        {
+          "platform": "sentinel-2c",
+          "time_utc": "2026-10-12T11:20:00Z",
+          "distance_km": 120.2,
+          "sun_elevation_deg": 41.6,
+          "tle_age_days": 15.3,
+          "confidence": "certain"
+        }
+      ]
+    }
+  }
+}

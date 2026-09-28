@@ -43,3 +43,9 @@ build/
 # *.mp4
 # *.faiss
 # *.stl
+
+# Pebble / waf
+.lock-waf*
+
+# local-only privacy patterns (never commit)
+tests/private_patterns.txt

@@ -1,0 +1,36 @@
+{
+  "name": "overpass",
+  "author": "Daniel Bally",
+  "version": "0.1.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Overpass",
+    "uuid": "ec4f4b0c-497d-4f5c-a0f6-f5e34d027ea3",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "CMD",
+      "PASSES",
+      "GENERATED",
+      "STATUS",
+      "PINS"
+    ],
+    "resources": {
+      "media": []
+    },
+    "capabilities": [
+      "location",
+      "configurable"
+    ]
+  }
+}

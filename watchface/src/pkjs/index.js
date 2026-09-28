@@ -1,0 +1,170 @@
+// Phone side of Overpass: locate, fetch TLEs and cloud forecast, predict passes (passes.js), send them
+// to the watch; record ground-truth pins as GeoJSON in localStorage and export them from the app's
+// settings page. Pins and home never leave the phone.
+
+var passes = require('./passes');
+var dev = require('./dev.json');  // emulator fixture: {"lat": .., "lon": ..}; ships as {}
+
+var CELESTRAK = 'https://celestrak.org/NORAD/elements/gp.php?FORMAT=TLE&CATNR=';
+var OPEN_METEO = 'https://api.open-meteo.com/v1/forecast?hourly=cloud_cover&forecast_days=16&timezone=UTC';
+var TLE_MAX_AGE_MS = 6 * 3600 * 1000;
+var HORIZON_MS = 16 * 86400 * 1000;
+var MAX_PASSES = 40;
+var CMD = { REFRESH: 1, PIN: 2 };
+
+// ---- storage ----------------------------------------------------------------------------------
+
+function load(key, fallback) {
+  try {
+    var v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function save(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { console.log('save ' + key + ': ' + e); }
+}
+
+function pins() { return load('pins', []); }
+
+// ---- network ----------------------------------------------------------------------------------
+
+function get(url, cb) {
+  var req = new XMLHttpRequest();
+  req.open('GET', url, true);
+  req.timeout = 20000;
+  req.onload = function () {
+    if (req.status >= 200 && req.status < 300) cb(null, req.responseText);
+    else cb('HTTP ' + req.status);
+  };
+  req.onerror = function () { cb('network error'); };
+  req.ontimeout = function () { cb('timeout'); };
+  req.send();
+}
+
+// TLEs for every satellite; cached 6 h; on failure fall back to any cached copy.
+function getTles(cb) {
+  var cache = load('tles', null);
+  if (cache && Date.now() - cache.fetched < TLE_MAX_AGE_MS) return cb(null, cache.tles);
+  var tles = {}, list = passes.SATELLITES.slice(), failed = false;
+  (function next() {
+    if (!list.length) {
+      if (failed) return cache ? cb(null, cache.tles) : cb('NO TLE');
+      save('tles', { fetched: Date.now(), tles: tles });
+      return cb(null, tles);
+    }
+    var s = list.shift();
+    get(CELESTRAK + s.norad, function (err, text) {
+      var lines = err ? [] : text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+      if (lines.length >= 3 && lines[1].charAt(0) === '1') tles[s.norad] = [lines[1], lines[2]];
+      else failed = true;
+      next();
+    });
+  })();
+}
+
+function getClouds(lat, lon, cb) {
+  get(OPEN_METEO + '&latitude=' + lat + '&longitude=' + lon, function (err, text) {
+    if (err) return cb({});
+    try {
+      var h = JSON.parse(text).hourly || {}, out = {};
+      (h.time || []).forEach(function (t, i) { out[t] = h.cloud_cover[i]; });
+      cb(out);
+    } catch (e) { cb({}); }
+  });
+}
+
+function locate(highAccuracy, cb) {
+  if (typeof dev.lat === 'number' && typeof dev.lon === 'number') {
+    return cb(null, { latitude: dev.lat, longitude: dev.lon, accuracy: 0 });
+  }
+  navigator.geolocation.getCurrentPosition(function (pos) { cb(null, pos.coords); },
+    function (err) { cb(err.message || 'no location'); },
+    { enableHighAccuracy: highAccuracy, timeout: 30000, maximumAge: highAccuracy ? 0 : 10 * 60000 });
+}
+
+// ---- watch messaging --------------------------------------------------------------------------
+
+function send(msg) {
+  Pebble.sendAppMessage(msg, null, function (e) { console.log('send failed: ' + JSON.stringify(e && e.error)); });
+}
+
+function status(text) { send({ STATUS: text }); }
+
+function refresh() {
+  status('LOCATING...');
+  locate(false, function (err, c) {
+    if (err) return status('NO FIX');
+    status('ORBITS...');
+    getTles(function (err2, tles) {
+      if (err2) return status('NO TLE: OFFLINE?');
+      var now = Date.now();
+      var list = passes.predict(tles, c.latitude, c.longitude, now - 5 * 60000, now + HORIZON_MS);
+      save('lastPasses', list.map(function (p) { return { platform: p.platform, timeMs: p.timeMs }; }));
+      getClouds(c.latitude, c.longitude, function (clouds) {
+        send({
+          PASSES: passes.packPasses(list, clouds, MAX_PASSES),
+          GENERATED: Math.round(now / 1000),
+          PINS: pins().length,
+          STATUS: list.length ? '' : 'NO PASS 16 D'
+        });
+      });
+    });
+  });
+}
+
+// A ground-truth pin: precise location now, tagged with the nearest predicted pass.
+function pin() {
+  status('PINNING...');
+  locate(true, function (err, c) {
+    if (err) return status('PIN FAILED: NO GPS');
+    var now = Date.now(), nearest = null;
+    load('lastPasses', []).forEach(function (p) {
+      if (!nearest || Math.abs(p.timeMs - now) < Math.abs(nearest.timeMs - now)) nearest = p;
+    });
+    var all = pins();
+    all.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [c.longitude, c.latitude] },
+      properties: {
+        time_utc: new Date(now).toISOString(),
+        accuracy_m: Math.round(c.accuracy || 0),
+        nearest_pass: nearest ? nearest.platform : null,
+        nearest_pass_utc: nearest ? new Date(nearest.timeMs).toISOString() : null,
+        minutes_from_pass: nearest ? Math.round((now - nearest.timeMs) / 60000) : null
+      }
+    });
+    save('pins', all);
+    send({ PINS: all.length, STATUS: 'PIN ' + all.length + ' SAVED +-' + Math.round(c.accuracy || 0) + ' M' });
+  });
+}
+
+Pebble.addEventListener('ready', refresh);
+
+Pebble.addEventListener('appmessage', function (e) {
+  var cmd = e.payload.CMD;
+  if (cmd === CMD.REFRESH) refresh();
+  if (cmd === CMD.PIN) pin();
+});
+
+// Settings page = pin export: the GeoJSON in a text box to copy, plus a clear button.
+Pebble.addEventListener('showConfiguration', function () {
+  var geojson = JSON.stringify({ type: 'FeatureCollection', features: pins() }, null, 1);
+  var html = '<!doctype html><meta name="viewport" content="width=device-width">' +
+    '<body style="font-family:sans-serif;background:#000;color:#fa0;padding:12px">' +
+    '<h3>Overpass ground-truth pins (' + pins().length + ')</h3>' +
+    '<textarea style="width:100%;height:60vh;background:#111;color:#eee">' +
+    geojson.replace(/</g, '&lt;') + '</textarea>' +
+    '<p><a style="color:#0ff" href="pebblejs://close#">Done</a> &nbsp; ' +
+    '<a style="color:#f55" href="pebblejs://close#clear">Clear all pins</a></p></body>';
+  Pebble.openURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+});
+
+Pebble.addEventListener('webviewclosed', function (e) {
+  if (e && e.response === 'clear') {
+    save('pins', []);
+    send({ PINS: 0, STATUS: 'PINS CLEARED' });
+  }
+});
