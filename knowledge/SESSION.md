@@ -26,3 +26,4 @@
 - 2026-09-27 22:35 — passes.js port; JS vs Python reference fixture (3 sites) 8/8; C passes.c + main.c; build clean (5.3 KB RAM)
 - 2026-09-27 22:50 — pytest 14/14; emulator W8/W9 PASS (after retry-until-foreground boot); CloudPebble sim dropped none
 - 2026-09-27 22:22 — commit: feat: Overpass watch app — next Landsat/Sentinel-2 passes, cloud, confidence, ground-truth pins | .gitignore,README.md,directives/build_watchapp.md,execution/emulator_check.py,execution/make_reference.py
+- 2026-09-27 22:25 — commit: feat: Overpass watch app — next Landsat/Sentinel-2 passes, cloud, confidence, ground-truth pins | .gitignore,README.md,directives/build_watchapp.md,execution/emulator_check.py,execution/make_reference.py

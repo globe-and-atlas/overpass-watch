@@ -20,6 +20,11 @@ the cloud forecast for that hour, and a confidence flag:
 **Pins** are exported from the app's settings page in the Pebble phone app, as a GeoJSON
 FeatureCollection to copy (with a clear-all button). Pins never leave the phone otherwise.
 
+## Install
+
+- [Open in CloudPebble](https://cloudpebble.repebble.com/ide/import/github/globe-and-atlas/overpass-watch/main) (the branch is in the link because CloudPebble's import defaults to `master`)
+- Or build locally: `cd watchface && pebble build && pebble install --cloudpebble build/watchface.pbw`
+
 ## How it works
 
 The phone predicts; the watch shows and pins.
