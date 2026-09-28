@@ -34,3 +34,4 @@ See procedural/publish_release.md for full evidence.
 - 2026-09-28 15:45 — verified public RePebble PBW is version 0.3.2 with correct package UUID. Current local rebuild differs only in comments and generated manifest timestamps; attaching exact public PBW bytes to GitHub release. Public listing description edit remains blocked by Dev Portal account mismatch.
 - 2026-09-28 15:40 — commit: docs: clarify Overpass 0.3.2 accuracy and release evidence | README.md,execution/render_store.py,knowledge/ERRORS.md,knowledge/INDEX.md,knowledge/SESSION.md
 - 2026-09-28 15:46 — independent published-state verification confirmed commit/release 0.3.2 and exact public RePebble PBW bytes on GitHub; live description still omits privacy/history/confidence corrections, pending linked publisher account.
+- 2026-09-28 15:46 — commit: docs: record session capture timeout | knowledge/ERRORS.md
